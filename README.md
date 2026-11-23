@@ -34,13 +34,13 @@ npm run dev
 - **教師帳號（隔離對照）**：`teacher_chen` / `teacher123`（管理「APCS 衝刺班」，加入代碼 `APCS99`）
 - **學生帳號**：`stu_wang`、`stu_lee`、`stu_chang`（`APCS2A`）與 `stu_wu`（`APCS99`），密碼皆為 `student123`
 
-## 部署至 Vercel + Turso 雲端持久化資料庫
+## 部署至 Vercel 並串接永久資料庫
 
-本專案採雙驅動資料庫設計（[src/lib/db.ts](src/lib/db.ts)）：當環境存在 `TURSO_DATABASE_URL` 時自動切換為 Turso（`@libsql/client/web`）遠端永久儲存。
+本專案採多驅動資料庫架構（[src/lib/db.ts](src/lib/db.ts)）：
 
-1. 於 Vercel 匯入此 GitHub 倉庫（`stevehelloworld/apcs_concept`）。
-2. 在 Vercel 專案頁的 **Storage / Marketplace** 新增 **Turso** 整合（提供免費額度），系統會自動注入 `TURSO_DATABASE_URL` 與 `TURSO_AUTH_TOKEN` 環境變數。
-3. 觸發 Production Redeploy 後，瀏覽 `/api/health` 確認回傳：
-   ```json
-   { "ok": true, "storage": "turso", "topics": 5, "questions": 30 }
-   ```
+1. **優先推薦：Neon Postgres（Vercel Marketplace 免費版）**
+   - 偵測到 `DATABASE_URL` 或 `POSTGRES_URL` 即自動切換為 `@neondatabase/serverless`，首次請求會自動建表並寫入完整 5 主題 30 題種子資料。
+   - 在 Vercel 專案 **Storage → Create Database → Neon** 建立並連結即可。
+2. **相容選項：Turso（libSQL）**
+   - 偵測到 `TURSO_DATABASE_URL` 與 `TURSO_AUTH_TOKEN` 即自動切換為 `@libsql/client/web`。
+3. 連結後觸發 Redeploy，瀏覽 `/api/health` 確認回傳 `storage: "neon-postgres"`（或 `"turso"`）、`topics: 5`、`questions: 30`。

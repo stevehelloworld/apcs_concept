@@ -8,7 +8,7 @@ web
 
 ## Stack
 
-Next.js 15 App Router + TypeScript + Tailwind CSS v4 + 雙驅動 SQLite/libSQL 架構（正式雲端部署使用 Turso `@libsql/client/web` 永久持久化，本機開發無須設定環境變數即自動使用 Node built-in `node:sqlite` 寫入 `data/apcs.db`）。
+Next.js 15 App Router + TypeScript + Tailwind CSS v4 + 多驅動持久化資料庫架構（優先支援 Neon Postgres `@neondatabase/serverless`、相容 Turso `@libsql/client/web`，本機開發免設環境變數自動使用 Node built-in `node:sqlite` 寫入 `data/apcs.db`）。
 
 ## Users
 
