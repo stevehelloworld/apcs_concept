@@ -1,0 +1,91 @@
+@import "tailwindcss";
+
+:root {
+  --bg-page: #F7F6F2;
+  --bg-surface: #FFFFFF;
+  --bg-sidebar: #F0EFEA;
+  --border-subtle: #E2E0D8;
+  --border-strong: #C9C6BB;
+  --text-primary: #17191C;
+  --text-secondary: #525866;
+  --text-muted: #6C7382;
+
+  /* Student primary indigo */
+  --student-primary: #1E4E8C;
+  --student-hover: #163C6E;
+  --student-soft: #EAF1FA;
+
+  /* Teacher primary pine green */
+  --teacher-primary: #0F6B5E;
+  --teacher-hover: #0B5349;
+  --teacher-soft: #E6F4F1;
+
+  /* Semantic */
+  --status-success: #157F4B;
+  --status-success-bg: #EAF6EF;
+  --status-error: #C23535;
+  --status-error-bg: #FCEEEE;
+  --status-warn: #B4690E;
+  --status-warn-bg: #FDF4E6;
+
+  /* Code surface */
+  --code-bg: #141820;
+  --code-border: #252C3A;
+  --code-gutter: #647087;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  background-color: var(--bg-page);
+  color: var(--text-primary);
+  font-family: var(--font-noto-sans-tc), "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background-color: #1E4E8C;
+  color: #FFFFFF;
+}
+
+.font-code {
+  font-family: var(--font-jetbrains-mono), "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Subtle custom scrollbars matching palette */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-sidebar);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #C9C6BB;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #9E9B90;
+}
+
+:focus-visible {
+  outline: 2px solid var(--student-primary);
+  outline-offset: 2px;
+}
+
+/* Smooth controlled transitions */
+.ui-transition {
+  transition-property: color, background-color, border-color, box-shadow, opacity, transform;
+  transition-duration: 180ms;
+  transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+}

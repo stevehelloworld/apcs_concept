@@ -1,0 +1,19 @@
+# dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# next.js
+.next/
+out/
+.vercel
+tsconfig.tsbuildinfo
+
+# local database & environment
+data/*.db*
+.env
+.env*.local
+
+# logs & temp
+npm-debug.log*
+.DS_Store
