@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { createClient } from "@libsql/client/web";
-import { neon } from "@neondatabase/serverless";
+import { neon, types as pgTypes } from "@neondatabase/serverless";
 import { seedDatabaseIfEmpty } from "./seed";
 import type {
   CoreConcept,
@@ -312,6 +312,7 @@ export function translateSqliteToPostgres(sql: string, isInsertRun: boolean): st
 }
 
 function createNeonClient(databaseUrl: string): DbClient {
+  pgTypes.setTypeParser(pgTypes.builtins.INT8 ?? 20, (val: string) => Number(val));
   const sqlClient = neon(databaseUrl);
 
   return {
@@ -348,16 +349,13 @@ function createNeonClient(databaseUrl: string): DbClient {
     },
     async execBatch(statements) {
       if (statements.length === 0) return;
-      const queries = statements.map((st) => {
-        if (typeof st === "string") {
-          return sqlClient.query(translateSqliteToPostgres(st, false), []);
-        }
-        return sqlClient.query(
-          translateSqliteToPostgres(st.sql, false),
-          normalizeArgs(st.args)
-        );
-      });
-      await sqlClient.transaction(queries);
+      await sqlClient.transaction((txn) =>
+        statements.map((st) =>
+          typeof st === "string"
+            ? txn.query(translateSqliteToPostgres(st, false), [])
+            : txn.query(translateSqliteToPostgres(st.sql, false), normalizeArgs(st.args))
+        )
+      );
     },
   };
 }
@@ -464,8 +462,48 @@ function createLocalSqliteClient(dbPath: string, storageMode: StorageMode): DbCl
   };
 }
 
+function isPostgresConnectionString(val: string | undefined): val is string {
+  if (!val) return false;
+  const trimmed = val.trim();
+  return trimmed.startsWith("postgres://") || trimmed.startsWith("postgresql://");
+}
+
+function resolvePostgresUrl(): string | undefined {
+  const directKeys = [
+    "DATABASE_URL",
+    "POSTGRES_URL",
+    "NEON_DATABASE_URL",
+    "POSTGRES_PRISMA_URL",
+    "DATABASE_URL_UNPOOLED",
+    "POSTGRES_URL_NON_POOLING",
+  ];
+  for (const key of directKeys) {
+    const val = process.env[key]?.trim();
+    if (val) return val;
+  }
+
+  const entries = Object.entries(process.env);
+  for (const [key, val] of entries) {
+    if (
+      /_(DATABASE_URL|POSTGRES_URL|POSTGRES_PRISMA_URL)$/.test(key) &&
+      isPostgresConnectionString(val)
+    ) {
+      return val.trim();
+    }
+  }
+  for (const [key, val] of entries) {
+    if (
+      /_(DATABASE_URL_UNPOOLED|POSTGRES_URL_NON_POOLING)$/.test(key) &&
+      isPostgresConnectionString(val)
+    ) {
+      return val.trim();
+    }
+  }
+  return undefined;
+}
+
 export function getStorageMode(): StorageMode {
-  if (process.env.DATABASE_URL || process.env.POSTGRES_URL) {
+  if (resolvePostgresUrl()) {
     return "neon-postgres";
   }
   if (process.env.TURSO_DATABASE_URL || process.env.LIBSQL_URL) {
@@ -484,7 +522,7 @@ export async function getDb(): Promise<DbClient> {
 
   if (!globalThis.__apcsDbInitPromise) {
     globalThis.__apcsDbInitPromise = (async () => {
-      const pgUrl = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+      const pgUrl = resolvePostgresUrl();
       const tursoUrl = process.env.TURSO_DATABASE_URL || process.env.LIBSQL_URL;
       const tursoToken = process.env.TURSO_AUTH_TOKEN || process.env.LIBSQL_AUTH_TOKEN;
 
