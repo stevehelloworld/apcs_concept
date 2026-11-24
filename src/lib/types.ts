@@ -300,3 +300,91 @@ export interface TeacherAnalyticsPayload {
     createdAt: string;
   }>;
 }
+
+export interface ManagedStudentSummary {
+  id: number;
+  username: string;
+  display_name: string;
+  created_at: string;
+  classes: Array<{
+    id: number;
+    name: string;
+    join_code: string;
+  }>;
+  total_attempts: number;
+  solved_distinct: number;
+  total_questions: number;
+  accuracy: number | null;
+  wrong_count: number;
+  last_attempt_at: string | null;
+}
+
+export interface TeacherStudentProgressPayload {
+  student: {
+    id: number;
+    username: string;
+    display_name: string;
+    created_at: string;
+    classes: Array<{
+      id: number;
+      name: string;
+      join_code: string;
+    }>;
+    other_teacher_class_count: number;
+  };
+  stats: {
+    totalAttempts: number;
+    uniqueSolved: number;
+    totalQuestions: number;
+    accuracy: number | null;
+    avgDurationSec: number;
+  };
+  topicMastery: Array<{
+    topicId: number;
+    slug: string;
+    title: string;
+    totalQuestions: number;
+    solvedCorrect: number;
+    attemptedDistinct: number;
+    accuracy: number | null;
+  }>;
+  typeMastery: Array<{
+    type: QuestionType;
+    label: string;
+    attempts: number;
+    correct: number;
+    accuracy: number | null;
+  }>;
+  assignments: Array<{
+    id: number;
+    class_id: number;
+    class_name: string;
+    title: string;
+    due_date: string | null;
+    question_count: number;
+    completed_count: number;
+    correct_count: number;
+  }>;
+  recentAttempts: Array<{
+    id: number;
+    question_id: number;
+    official_ref: string | null;
+    title: string;
+    topic_title: string;
+    question_type: QuestionType;
+    selected_option: "A" | "B" | "C" | "D";
+    correct_option: "A" | "B" | "C" | "D";
+    is_correct: boolean;
+    duration_sec: number;
+    created_at: string;
+  }>;
+  availableQuestions: Array<{
+    id: number;
+    official_ref: string | null;
+    title: string;
+    topic_id: number;
+    topic_title: string;
+    is_solved: boolean;
+    attempt_count: number;
+  }>;
+}

@@ -114,14 +114,8 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="border-t border-[#D4DAE4] pt-4 text-center text-sm text-[#4B5565]">
-            還沒有帳號嗎？{" "}
-            <Link
-              href="/register"
-              className="font-bold text-[#D93B09] hover:underline"
-            >
-              立即註冊學生／教師帳號
-            </Link>
+          <div className="border-t border-[#D4DAE4] pt-4 text-center text-xs font-medium text-[#4B5565]">
+            尚未擁有帳號？請聯繫任課教師由管理後台開通學生帳密。
           </div>
         </div>
       </div>

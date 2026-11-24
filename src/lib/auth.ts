@@ -155,6 +155,144 @@ export async function assertTeacherOwnsClass(
   return { ok: true, classRow: plain };
 }
 
+export async function assertTeacherOwnsAllClasses(
+  teacherId: number,
+  classIds: number[]
+): Promise<
+  | { ok: true; classRows: Array<{ id: number; name: string; teacher_id: number; join_code: string }> }
+  | { ok: false; response: NextResponse }
+> {
+  const uniqueIds = Array.from(new Set(classIds.map((id) => Number(id))));
+  if (
+    uniqueIds.length === 0 ||
+    uniqueIds.some((id) => !Number.isInteger(id) || id <= 0)
+  ) {
+    return {
+      ok: false,
+      response: NextResponse.json({ error: "請至少選擇一個有效的所屬班級。" }, { status: 400 }),
+    };
+  }
+
+  const db = await getDb();
+  const placeholders = uniqueIds.map(() => "?").join(",");
+  const rows = await db.queryAll<{
+    id: number;
+    name: string;
+    teacher_id: number;
+    join_code: string;
+  }>(
+    `SELECT id, name, teacher_id, join_code FROM classes WHERE id IN (${placeholders})`,
+    uniqueIds
+  );
+
+  if (
+    rows.length !== uniqueIds.length ||
+    rows.some((r) => Number(r.teacher_id) !== teacherId)
+  ) {
+    return {
+      ok: false,
+      response: NextResponse.json(
+        { error: "指定的班級不存在或非本人管理班級。" },
+        { status: 403 }
+      ),
+    };
+  }
+
+  return { ok: true, classRows: rows };
+}
+
+export async function assertTeacherManagesStudent(
+  teacherId: number,
+  studentId: number
+): Promise<
+  | {
+      ok: true;
+      student: AuthUser;
+      ownedClasses: Array<{ class_id: number; name: string; join_code: string }>;
+      otherTeacherClassCount: number;
+    }
+  | { ok: false; response: NextResponse }
+> {
+  if (!Number.isInteger(studentId) || studentId <= 0) {
+    return {
+      ok: false,
+      response: NextResponse.json({ error: "無效的學生編號。" }, { status: 400 }),
+    };
+  }
+
+  const db = await getDb();
+  const userRow = await db.queryOne<AuthUser>(
+    "SELECT id, username, display_name, role, created_at FROM users WHERE id = ?",
+    [studentId]
+  );
+  if (!userRow) {
+    return {
+      ok: false,
+      response: NextResponse.json({ error: "找不到該位學生帳號。" }, { status: 404 }),
+    };
+  }
+
+  const student = toPlain<AuthUser>(userRow);
+  if (student.role !== "student") {
+    return {
+      ok: false,
+      response: NextResponse.json(
+        { error: "僅能管理學生帳號，不可修改教師帳號。" },
+        { status: 403 }
+      ),
+    };
+  }
+
+  const membershipRows = await db.queryAll<{
+    class_id: number;
+    teacher_id: number;
+    name: string;
+    join_code: string;
+  }>(
+    `SELECT cm.class_id, c.teacher_id, c.name, c.join_code
+     FROM class_members cm
+     JOIN classes c ON c.id = cm.class_id
+     WHERE cm.student_id = ?
+     ORDER BY c.id ASC`,
+    [studentId]
+  );
+
+  const ownedClasses = membershipRows
+    .filter((r) => Number(r.teacher_id) === teacherId)
+    .map((r) => ({
+      class_id: Number(r.class_id),
+      name: r.name,
+      join_code: r.join_code,
+    }));
+
+  const otherTeacherClassCount = membershipRows.filter(
+    (r) => Number(r.teacher_id) !== teacherId
+  ).length;
+
+  if (ownedClasses.length === 0) {
+    return {
+      ok: false,
+      response: NextResponse.json(
+        { error: "無權存取或修改非本人班級的學生帳號。" },
+        { status: 403 }
+      ),
+    };
+  }
+
+  return {
+    ok: true,
+    student: {
+      id: Number(student.id),
+      username: String(student.username),
+      display_name: String(student.display_name),
+      role: "student",
+      created_at: String(student.created_at),
+    },
+    ownedClasses,
+    otherTeacherClassCount,
+  };
+}
+
 export async function getStudentClassIds(studentId: number): Promise<number[]> {
   const db = await getDb();
   const rows = await db.queryAll<{ class_id: number }>(

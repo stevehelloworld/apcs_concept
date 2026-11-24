@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Check, Copy, Plus, Trash2, UserMinus, Users } from "lucide-react";
+import Link from "next/link";
+import { Check, Copy, Plus, Trash2, UserCog, UserMinus, Users } from "lucide-react";
 import type { ClassRecord } from "@/lib/types";
 
 interface ClassMemberStat {
@@ -259,13 +260,18 @@ export function TeacherClassesClient({
               {loadingMembers ? (
                 <p className="text-xs font-bold text-[#4B5565]">載入學生名單中...</p>
               ) : members.length === 0 ? (
-                <p className="synth-recess p-4 text-xs leading-relaxed text-[#4B5565]">
-                  本班目前尚無學生加入。請將代碼{" "}
-                  <code className="font-code font-bold text-[#11151C]">
-                    {activeClass.join_code}
-                  </code>{" "}
-                  提供給學生於註冊或學習進度頁輸入。
-                </p>
+                <div className="synth-recess p-4 text-xs leading-relaxed text-[#4B5565] space-y-2">
+                  <p>
+                    本班目前尚無學生。系統已關閉對外自行註冊，請前往「學生帳號與進度」由教師直接建立或分派學生到此班級。
+                  </p>
+                  <Link
+                    href="/teacher/students"
+                    className="synth-pad-emerald inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
+                  >
+                    <UserCog className="h-3.5 w-3.5" strokeWidth={2} />
+                    <span>前往建立學生帳號</span>
+                  </Link>
+                </div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse text-xs">
@@ -296,14 +302,23 @@ export function TeacherClassesClient({
                             {m.accuracy !== null ? `${m.accuracy}%` : "—"}
                           </td>
                           <td className="py-2.5 text-right">
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveStudent(m.student_id)}
-                              className="inline-flex items-center gap-1 rounded-lg border border-[#C4CBD6] bg-white px-2.5 py-1 text-[11px] font-bold text-[#C62828] hover:bg-[#FDECEC]"
-                            >
-                              <UserMinus className="h-3 w-3" strokeWidth={2} />
-                              <span>移出</span>
-                            </button>
+                            <div className="inline-flex items-center gap-1.5">
+                              <Link
+                                href={`/teacher/students?studentId=${m.student_id}`}
+                                className="inline-flex items-center gap-1 rounded-lg border border-[#C4CBD6] bg-white px-2.5 py-1 text-[11px] font-bold text-[#007A5B] hover:border-[#007A5B]"
+                              >
+                                <UserCog className="h-3 w-3" strokeWidth={2} />
+                                <span>管理</span>
+                              </Link>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveStudent(m.student_id)}
+                                className="inline-flex items-center gap-1 rounded-lg border border-[#C4CBD6] bg-white px-2.5 py-1 text-[11px] font-bold text-[#C62828] hover:bg-[#FDECEC]"
+                              >
+                                <UserMinus className="h-3 w-3" strokeWidth={2} />
+                                <span>移出</span>
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}

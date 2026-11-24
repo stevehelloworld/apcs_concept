@@ -326,11 +326,7 @@ export default async function HomePage() {
               學生自主練習與班級同步
             </h3>
             <p className="text-sm leading-relaxed text-[#4B5565]">
-              登入或註冊帳號並輸入老師的 6 碼班級代碼（如{" "}
-              <code className="rounded bg-[#FFF1EC] px-1.5 py-0.5 font-code text-xs font-bold text-[#B83006]">
-                APCS2A
-              </code>
-              ），就能在所有關卡方格點亮綠燈破關印記，並將錯題一鍵送回追蹤器重播。
+              由任課教師統一開通學生帳號並分派所屬班級，登入後即可在所有關卡方格點亮綠燈破關印記，並將錯題一鍵送回追蹤器重播。
             </p>
           </div>
         </div>

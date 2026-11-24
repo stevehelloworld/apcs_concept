@@ -8,12 +8,14 @@ import {
   ClipboardList,
   Database,
   ExternalLink,
+  UserCog,
   Users,
 } from "lucide-react";
 
 const TEACHER_NAV = [
   { href: "/teacher", label: "班級數據總覽", icon: BarChart3, exact: true },
   { href: "/teacher/classes", label: "班級與學生名冊", icon: Users, exact: false },
+  { href: "/teacher/students", label: "學生帳號與進度", icon: UserCog, exact: false },
   { href: "/teacher/questions", label: "題庫與迷思管理", icon: Database, exact: false },
   { href: "/teacher/topics", label: "五大主題講義 CMS", icon: BookOpenCheck, exact: false },
   { href: "/teacher/assignments", label: "作業指派與追蹤", icon: ClipboardList, exact: false },

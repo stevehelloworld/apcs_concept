@@ -14,7 +14,6 @@ import {
   ShieldCheck,
   Terminal,
   User,
-  UserPlus,
   X,
 } from "lucide-react";
 import type { AuthUser } from "@/lib/types";
@@ -164,22 +163,13 @@ export function TopNav({ initialUser }: TopNavProps) {
               </button>
             </>
           ) : (
-            <>
-              <Link
-                href="/login"
-                className="synth-pad inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold"
-              >
-                <LogIn className="h-3.5 w-3.5" strokeWidth={2} />
-                <span>登入</span>
-              </Link>
-              <Link
-                href="/register"
-                className="synth-pad-orange inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold"
-              >
-                <UserPlus className="h-3.5 w-3.5" strokeWidth={2} />
-                <span>免費註冊</span>
-              </Link>
-            </>
+            <Link
+              href="/login"
+              className="synth-pad-orange inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold"
+            >
+              <LogIn className="h-3.5 w-3.5" strokeWidth={2.2} />
+              <span>師生登入</span>
+            </Link>
           )}
         </div>
 
@@ -252,24 +242,14 @@ export function TopNav({ initialUser }: TopNavProps) {
                 </button>
               </div>
             ) : (
-              <div className="grid grid-cols-2 gap-2.5">
-                <Link
-                  href="/login"
-                  onClick={() => setMobileOpen(false)}
-                  className="synth-pad flex items-center justify-center gap-1.5 py-2.5 text-sm font-bold"
-                >
-                  <LogIn className="h-4 w-4" strokeWidth={2} />
-                  <span>登入</span>
-                </Link>
-                <Link
-                  href="/register"
-                  onClick={() => setMobileOpen(false)}
-                  className="synth-pad-orange flex items-center justify-center gap-1.5 py-2.5 text-sm font-bold"
-                >
-                  <UserPlus className="h-4 w-4" strokeWidth={2} />
-                  <span>免費註冊</span>
-                </Link>
-              </div>
+              <Link
+                href="/login"
+                onClick={() => setMobileOpen(false)}
+                className="synth-pad-orange flex w-full items-center justify-center gap-1.5 py-2.5 text-sm font-bold"
+              >
+                <LogIn className="h-4 w-4" strokeWidth={2.2} />
+                <span>師生登入</span>
+              </Link>
             )}
           </div>
         </div>
