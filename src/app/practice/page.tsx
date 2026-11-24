@@ -41,7 +41,7 @@ export default async function PracticePage({
   });
 
   return (
-    <div className="mx-auto max-w-[1320px] px-4 py-6 sm:px-6 lg:py-8">
+    <div className="mx-auto max-w-[1520px] px-3 sm:px-5 py-4">
       <PracticeWorkbenchClient
         topics={topics}
         initialQuestions={initialQuestions}
@@ -53,6 +53,7 @@ export default async function PracticePage({
         initialAssignmentId={initialAssignmentId}
         initialQuestionId={initialQuestionId}
         isLoggedIn={Boolean(user)}
+        userRole={user?.role ?? null}
       />
     </div>
   );

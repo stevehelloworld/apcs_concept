@@ -12,7 +12,7 @@ export default async function HomePage() {
   ]);
 
   return (
-    <div className="mx-auto max-w-[1320px] px-4 py-6 sm:px-6 lg:py-8">
+    <div className="mx-auto max-w-[1520px] px-3 sm:px-5 py-4">
       <TransitNetworkMap
         topics={topics}
         questions={questions}

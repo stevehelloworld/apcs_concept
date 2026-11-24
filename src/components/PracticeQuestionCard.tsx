@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   AlertCircle,
   CheckCircle2,
   ChevronDown,
   ChevronUp,
+  Eye,
   PlayCircle,
   Send,
   XCircle,
@@ -20,6 +21,8 @@ interface PracticeQuestionCardProps {
   question: PublicQuestionRecord;
   assignmentId?: number | null;
   isLoggedIn: boolean;
+  userRole?: "student" | "teacher" | null;
+  projectorMode?: boolean;
   onAttempted?: (questionId: number, result: AttemptSubmitResult) => void;
 }
 
@@ -27,16 +30,21 @@ export function PracticeQuestionCard({
   question,
   assignmentId = null,
   isLoggedIn,
+  userRole = null,
+  projectorMode = false,
   onAttempted,
 }: PracticeQuestionCardProps) {
   const [selected, setSelected] = useState<"A" | "B" | "C" | "D" | null>(
     question.user_last_attempt?.selected_option ?? null
   );
   const [submitting, setSubmitting] = useState(false);
+  const [revealing, setRevealing] = useState(false);
   const [result, setResult] = useState<AttemptSubmitResult | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [showTrace, setShowTrace] = useState(false);
   const [startTime, setStartTime] = useState<number>(() => Date.now());
+
+  const canReveal = !isLoggedIn || userRole === "teacher";
 
   useEffect(() => {
     setSelected(question.user_last_attempt?.selected_option ?? null);
@@ -45,6 +53,55 @@ export function PracticeQuestionCard({
     setShowTrace(false);
     setStartTime(Date.now());
   }, [question.id, question.user_last_attempt?.selected_option]);
+
+  const handleClassroomReveal = useCallback(async () => {
+    if (!canReveal || revealing) return;
+    setRevealing(true);
+    setErrorMsg(null);
+    try {
+      const res = await fetch(`/api/questions/${question.id}/reveal`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ selectedOption: selected ?? undefined }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        setErrorMsg(data.error ?? "無法載入解析，請重試。");
+        return;
+      }
+      setResult(data as AttemptSubmitResult);
+    } catch {
+      setErrorMsg("網路連線異常，請重試。");
+    } finally {
+      setRevealing(false);
+    }
+  }, [canReveal, revealing, question.id, selected]);
+
+  useEffect(() => {
+    if (!projectorMode) return;
+    function onKeyDown(e: KeyboardEvent) {
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === "INPUT" ||
+          target.tagName === "TEXTAREA" ||
+          target.tagName === "SELECT" ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+      if (!e.shiftKey && !e.metaKey && !e.ctrlKey && !e.altKey && e.key.toLowerCase() === "r") {
+        e.preventDefault();
+        if (!result && canReveal) {
+          void handleClassroomReveal();
+        } else if (result && result.traceSteps && result.traceSteps.length > 0) {
+          setShowTrace((prev) => !prev);
+        }
+      }
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [projectorMode, result, canReveal, handleClassroomReveal]);
 
   async function handleSubmit() {
     if (!selected) return;
@@ -84,7 +141,7 @@ export function PracticeQuestionCard({
 
   return (
     <article className="rail-frame p-4 sm:p-5 space-y-4">
-      {/* Meta Strip */}
+      {/* Compact Meta Header */}
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/15 pb-3">
         <div className="flex flex-wrap items-center gap-2 text-xs">
           {question.official_ref && (
@@ -109,6 +166,9 @@ export function PracticeQuestionCard({
               {question.class_name}
             </span>
           )}
+          <h3 className="text-base sm:text-lg font-black text-white ml-1">
+            {question.title}
+          </h3>
         </div>
 
         {question.user_last_attempt && !result && (
@@ -133,18 +193,23 @@ export function PracticeQuestionCard({
         )}
       </div>
 
-      <h3 className="text-base font-black text-white">{question.title}</h3>
+      {/* 820px+ Split Cockpit: Big Code Left + Prompt & Large Options Right */}
+      <div className="cockpit-2col">
+        <div className="min-w-0">
+          <PythonCodeView
+            code={question.code}
+            caption={question.official_ref ?? "PYTHON 3"}
+          />
+        </div>
 
-      <div className="grid gap-5 lg:grid-cols-12">
-        {/* Left: Prompt + 4 Option Rows */}
-        <div className="flex flex-col justify-between gap-4 lg:col-span-6">
+        <div className="flex flex-col justify-between gap-4 min-w-0">
           <div className="space-y-3.5">
-            <p className="whitespace-pre-line text-sm leading-relaxed text-[#B8C5E0]">
+            <p className="whitespace-pre-line text-sm sm:text-base font-medium leading-relaxed text-[#B8C5E0]">
               {question.prompt}
             </p>
 
             <div
-              className="space-y-2"
+              className="space-y-2.5"
               role="radiogroup"
               aria-label={`題目 ${question.title} 選項`}
             >
@@ -177,15 +242,15 @@ export function PracticeQuestionCard({
                       setSelected(opt.key);
                       setErrorMsg(null);
                     }}
-                    disabled={submitting}
-                    className={`flex w-full items-start gap-3 rounded-[5px] border px-3 py-2 text-left text-sm ui-transition ${btnCls}`}
+                    disabled={submitting || revealing}
+                    className={`flex w-full items-start gap-3 rounded-[5px] border px-3.5 py-2.5 text-left ui-transition ${btnCls}`}
                   >
                     <span
-                      className={`mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded border font-code text-xs font-bold ${badgeCls}`}
+                      className={`mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded border font-code text-xs font-bold ${badgeCls}`}
                     >
                       {opt.key}
                     </span>
-                    <span className="font-code text-[13px] font-medium leading-snug break-all pt-0.5">
+                    <span className="font-code text-sm sm:text-[15px] font-medium leading-snug break-all pt-0.5">
                       {opt.text}
                     </span>
                   </button>
@@ -207,32 +272,44 @@ export function PracticeQuestionCard({
               </div>
             )}
 
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={handleSubmit}
-                disabled={!selected || submitting}
-                className="rail-btn-primary inline-flex items-center gap-1.5 px-5 py-2 text-xs font-bold disabled:cursor-not-allowed disabled:opacity-45"
-              >
-                <Send className="h-3.5 w-3.5" strokeWidth={2.2} />
-                <span>
-                  {submitting ? "批改中" : result ? "重新作答" : "送出批改"}
-                </span>
-              </button>
+            <div className="flex flex-wrap items-center justify-end gap-2">
+              {canReveal && (
+                <button
+                  type="button"
+                  onClick={handleClassroomReveal}
+                  disabled={revealing || submitting}
+                  className="rail-btn-cobalt inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold disabled:cursor-not-allowed disabled:opacity-45"
+                >
+                  <Eye className="h-3.5 w-3.5" strokeWidth={2.2} />
+                  <span>
+                    {revealing
+                      ? "載入中"
+                      : projectorMode
+                      ? "課堂揭曉解析 [R]"
+                      : "課堂揭曉解析"}
+                  </span>
+                </button>
+              )}
+
+              {isLoggedIn && (
+                <button
+                  type="button"
+                  onClick={handleSubmit}
+                  disabled={!selected || submitting || revealing}
+                  className="rail-btn-primary inline-flex items-center gap-1.5 px-5 py-2 text-xs font-bold disabled:cursor-not-allowed disabled:opacity-45"
+                >
+                  <Send className="h-3.5 w-3.5" strokeWidth={2.2} />
+                  <span>
+                    {submitting ? "批改中" : result ? "重新作答" : "送出批改"}
+                  </span>
+                </button>
+              )}
             </div>
           </div>
         </div>
-
-        {/* Right: Code */}
-        <div className="lg:col-span-6">
-          <PythonCodeView
-            code={question.code}
-            caption={question.official_ref ?? "PYTHON 3"}
-          />
-        </div>
       </div>
 
-      {/* Diagnostic Result */}
+      {/* Diagnostic Result (strictly hidden until revealed or submitted) */}
       {result && (
         <div className="space-y-3 border-t border-white/20 pt-4">
           <div
@@ -249,23 +326,25 @@ export function PracticeQuestionCard({
                 <XCircle className="h-4 w-4 text-[#FF7A85]" strokeWidth={2.2} />
               )}
               <span className={result.isCorrect ? "text-[#4ADE80]" : "text-[#FF7A85]"}>
-                {result.isCorrect
+                {result.attemptId === 0 && !selected
+                  ? `正解：${result.correctOption}`
+                  : result.isCorrect
                   ? `正確 (${result.correctOption})`
                   : `答錯（選 ${result.selectedOption} / 正解 ${result.correctOption}）`}
               </span>
             </div>
             {result.selectedMisconception && (
-              <p className="mt-1.5 text-xs leading-relaxed text-[#B8C5E0]">
+              <p className="mt-1.5 text-sm leading-relaxed text-[#B8C5E0]">
                 {result.selectedMisconception}
               </p>
             )}
           </div>
 
           <div className="rail-well p-3.5">
-            <div className="mb-1 font-code text-[11px] font-bold text-[#7E91B8]">
+            <div className="mb-1 font-code text-xs font-bold text-[#7E91B8]">
               詳解
             </div>
-            <p className="whitespace-pre-line text-xs leading-relaxed text-[#B8C5E0]">
+            <p className="whitespace-pre-line text-sm leading-relaxed text-[#B8C5E0]">
               {result.explanation}
             </p>
           </div>

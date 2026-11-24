@@ -1,6 +1,6 @@
 ---
 name: APCS RAIL 程式識讀路網
-description: 午夜藍琺瑯都市捷運圖風格（Midnight-Blue Enamel Transit Diagram）的國高中 Python APCS 互動路網與班級調度後台設計系統
+description: 午夜藍琺瑯都市捷運圖與明亮教室投影駕駛艙（Midnight-Blue Enamel & Bright Projector Cockpit）的國高中 Python APCS 互動路網與班級調度後台設計系統
 colors:
   enamel-ground: "#0B1230"
   enamel-deep: "#070C22"
@@ -13,6 +13,15 @@ colors:
   enamel-input-focus: "#09102D"
   enamel-thumb: "#273873"
   enamel-thumb-hover: "#3B529E"
+  bright-ground: "#F4F6FA"
+  bright-well: "#F8FAFC"
+  bright-plate: "#F1F5F9"
+  bright-plate-hover: "#E2E8F0"
+  bright-ink: "#0F172A"
+  bright-ink-secondary: "#334155"
+  bright-ink-muted: "#475569"
+  bright-border: "#CBD5E1"
+  bright-border-strong: "#94A3B8"
   porcelain-white: "#FFFFFF"
   porcelain-secondary: "#B8C5E0"
   porcelain-muted: "#7E91B8"
@@ -51,9 +60,14 @@ typography:
     lineHeight: 1.6
   code:
     fontFamily: "JetBrains Mono, monospace"
-    fontSize: "13px"
+    fontSize: "15px"
     fontWeight: 500
-    lineHeight: 1.6
+    lineHeight: 1.75
+  code-large:
+    fontFamily: "JetBrains Mono, monospace"
+    fontSize: "19px"
+    fontWeight: 500
+    lineHeight: 1.85
   label:
     fontFamily: "JetBrains Mono, Noto Sans TC, monospace"
     fontSize: "0.75rem"

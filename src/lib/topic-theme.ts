@@ -23,7 +23,7 @@ const TOPIC_THEMES: Record<string, TopicChannelTheme> = {
     buttonHover: "#C51624",
     softBg: "rgba(226, 29, 45, 0.14)",
     border: "rgba(226, 29, 45, 0.50)",
-    text: "#FF7A85",
+    text: "var(--tone-l1)",
     labLabel: "分支示波器",
   },
   "loops-range": {
@@ -35,7 +35,7 @@ const TOPIC_THEMES: Record<string, TopicChannelTheme> = {
     buttonHover: "#1646CC",
     softBg: "rgba(30, 91, 255, 0.15)",
     border: "rgba(30, 91, 255, 0.52)",
-    text: "#7AA4FF",
+    text: "var(--tone-l2)",
     labLabel: "迴圈尺規",
   },
   "lists-grid": {
@@ -47,7 +47,7 @@ const TOPIC_THEMES: Record<string, TopicChannelTheme> = {
     buttonHover: "#127230",
     softBg: "rgba(34, 177, 76, 0.14)",
     border: "rgba(34, 177, 76, 0.50)",
-    text: "#4ADE80",
+    text: "var(--tone-l3)",
     labLabel: "網格掃描",
   },
   "functions-recursion": {
@@ -59,7 +59,7 @@ const TOPIC_THEMES: Record<string, TopicChannelTheme> = {
     buttonHover: "#E0AA00",
     softBg: "rgba(255, 194, 14, 0.14)",
     border: "rgba(255, 194, 14, 0.50)",
-    text: "#FFD452",
+    text: "var(--tone-l4)",
     labLabel: "遞迴堆疊",
   },
   "algorithms-complexity": {
@@ -71,7 +71,7 @@ const TOPIC_THEMES: Record<string, TopicChannelTheme> = {
     buttonHover: "#0E9AA5",
     softBg: "rgba(20, 184, 196, 0.14)",
     border: "rgba(20, 184, 196, 0.50)",
-    text: "#5EEAD4",
+    text: "var(--tone-l5)",
     labLabel: "演算法競速",
   },
 };
