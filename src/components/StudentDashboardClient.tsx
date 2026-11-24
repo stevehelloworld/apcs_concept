@@ -7,10 +7,8 @@ import {
   AlertCircle,
   ArrowRight,
   CheckCircle2,
-  ClipboardList,
   PlusCircle,
   RefreshCw,
-  Users,
 } from "lucide-react";
 import { getTopicTheme, QUESTION_TYPE_PAD_CODES } from "@/lib/topic-theme";
 import type { StudentDashboardPayload } from "@/lib/types";
@@ -53,101 +51,92 @@ export function StudentDashboardClient({ initialData }: StudentDashboardClientPr
         setJoinError(json.error ?? "無法加入班級，請確認代碼。");
         return;
       }
-      setJoinSuccess(`已成功加入「${json.joinedClass.name}」！`);
+      setJoinSuccess(`已加入「${json.joinedClass.name}」`);
       setJoinCode("");
       await refreshDashboard();
       router.refresh();
     } catch {
-      setJoinError("網路連線異常，請重試。");
+      setJoinError("網路連線異常");
     } finally {
       setJoining(false);
     }
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 space-y-8">
-      {/* Header Console */}
-      <section className="synth-panel-hard p-5 sm:p-6 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black text-[#11151C] sm:text-3xl">
-            {data.user.display_name} 的學習實驗紀錄
+    <div className="mx-auto max-w-[1320px] px-4 py-6 sm:px-6 lg:py-8 space-y-6">
+      {/* Compact Header */}
+      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/20 pb-4">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <h1 className="font-display text-3xl font-extrabold text-white">
+            {data.user.display_name}
           </h1>
-          <p className="mt-1 text-sm text-[#4B5565]">
-            帳號{" "}
-            <span className="rounded bg-[#DDE2EA] px-1.5 py-0.5 font-code text-xs font-bold text-[#11151C]">
-              {data.user.username}
-            </span>{" "}
-            · 即時追蹤五大模組過關數、六大考法正確率與班級任務
-          </p>
+          <span className="rounded bg-[#070C22] border border-white/20 px-2 py-0.5 font-code text-xs font-bold text-[#B8C5E0]">
+            {data.user.username}
+          </span>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex items-center gap-2">
           <button
             type="button"
             onClick={refreshDashboard}
-            className="synth-pad inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold"
+            className="rail-btn inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
           >
             <RefreshCw className="h-3.5 w-3.5" strokeWidth={2} />
-            <span>同步數據</span>
+            <span>同步</span>
           </button>
           <Link
             href="/practice"
-            className="synth-pad-orange inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold"
+            className="rail-btn-primary inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold"
           >
-            <span>前往刷題實驗台</span>
+            <span>刷題</span>
             <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.2} />
           </Link>
         </div>
-      </section>
+      </header>
 
-      {/* Recessed OLED Telemetry Strip */}
-      <section className="synth-oled grid gap-4 p-5 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-[#262F3F]">
-        <div className="lg:pr-4">
-          <div className="font-display text-3xl font-bold text-[#FF8A65] tabular-nums">
+      {/* 4-Column Porcelain-Ruled KPI Strip */}
+      <section className="rail-frame grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-white/15">
+        <div className="p-4">
+          <div className="font-code text-[11px] font-bold text-[#7E91B8]">破關</div>
+          <div className="mt-1 font-display text-3xl font-extrabold text-white tabular-nums">
             {data.stats.uniqueSolved} / {data.stats.totalVisibleQuestions}
           </div>
-          <div className="mt-1 text-xs font-bold text-white">已過關獨立題數</div>
-          <div className="mt-0.5 text-[11px] text-[#A8B6CC]">至少答對一次的題目</div>
         </div>
-
-        <div className="lg:px-4">
-          <div className="font-display text-3xl font-bold text-[#EEF2F8] tabular-nums">
+        <div className="p-4">
+          <div className="font-code text-[11px] font-bold text-[#7E91B8]">作答</div>
+          <div className="mt-1 font-display text-3xl font-extrabold text-white tabular-nums">
             {data.stats.totalAttempts}
           </div>
-          <div className="mt-1 text-xs font-bold text-white">累計實戰送出次數</div>
-          <div className="mt-0.5 text-[11px] text-[#A8B6CC]">含訂正與重複挑戰</div>
         </div>
-
-        <div className="lg:px-4">
-          <div className="font-display text-3xl font-bold text-[#00E5A0] tabular-nums">
+        <div className="p-4">
+          <div className="font-code text-[11px] font-bold text-[#7E91B8]">正確率</div>
+          <div className="mt-1 font-display text-3xl font-extrabold text-[#4ADE80] tabular-nums">
             {data.stats.totalAttempts > 0 ? `${data.stats.accuracy}%` : "—"}
           </div>
-          <div className="mt-1 text-xs font-bold text-white">整體作答正確率</div>
-          <div className="mt-0.5 text-[11px] text-[#A8B6CC]">即時批改動態統計</div>
         </div>
-
-        <div className="lg:pl-4">
-          <div className="font-display text-3xl font-bold text-[#38BDF8] tabular-nums">
+        <div className="p-4">
+          <div className="font-code text-[11px] font-bold text-[#7E91B8]">均時</div>
+          <div className="mt-1 font-display text-3xl font-extrabold text-[#7AA4FF] tabular-nums">
             {data.stats.avgDurationSec > 0 ? `${data.stats.avgDurationSec}s` : "—"}
           </div>
-          <div className="mt-1 text-xs font-bold text-white">平均單題思考時間</div>
-          <div className="mt-0.5 text-[11px] text-[#A8B6CC]">掌握 APCS 讀題節奏</div>
         </div>
       </section>
 
-      {/* 5-Channel Topic Mastery + 6-Pad Type Mastery */}
+      {/* Line Mastery + Exam Type Mastery */}
       <div className="grid gap-6 lg:grid-cols-12">
-        <section className="lg:col-span-6 synth-panel-hard p-5 sm:p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-black text-[#11151C]">五大模組破關進度條</h2>
+        <section className="lg:col-span-6 rail-frame p-4 sm:p-5 space-y-3">
+          <div className="flex items-center justify-between border-b border-white/15 pb-2.5">
+            <h2 className="font-display text-base font-extrabold tracking-wide text-white">
+              路線進度
+            </h2>
             <Link
               href="/topics"
-              className="text-xs font-bold text-[#D93B09] hover:underline"
+              className="font-code text-xs font-bold text-[#B8C5E0] hover:text-white"
             >
-              前往模組地圖 →
+              路線圖 →
             </Link>
           </div>
-          <div className="space-y-3.5">
+          <div className="space-y-3">
             {data.topicMastery.map((t, idx) => {
               const theme = getTopicTheme(t.slug, idx);
               const pct =
@@ -155,26 +144,29 @@ export function StudentDashboardClient({ initialData }: StudentDashboardClientPr
                   ? Math.round((t.solvedCorrect / t.totalQuestions) * 100)
                   : 0;
               return (
-                <div key={t.topicId} className="space-y-1.5">
+                <div key={t.topicId} className="space-y-1">
                   <div className="flex items-center justify-between gap-2 text-xs">
                     <Link
                       href={`/topics/${t.slug}`}
-                      className="inline-flex items-center gap-1.5 font-bold text-[#11151C] hover:underline truncate"
+                      className="inline-flex items-center gap-2 font-bold text-white hover:underline truncate"
                     >
                       <span
-                        className="rounded px-1.5 py-0.5 font-display text-[10px] font-bold text-white shrink-0"
-                        style={{ backgroundColor: theme.buttonBg }}
+                        className="rounded px-1.5 py-0.5 font-code text-[10px] font-bold shrink-0"
+                        style={{
+                          backgroundColor: theme.hex,
+                          color: theme.buttonText,
+                        }}
                       >
                         {theme.code}
                       </span>
                       <span className="truncate">{t.title}</span>
                     </Link>
-                    <span className="font-code text-[#4B5565] tabular-nums shrink-0">
+                    <span className="font-code text-[#B8C5E0] tabular-nums shrink-0">
                       {t.solvedCorrect}/{t.totalQuestions}
-                      {t.accuracy !== null ? ` · ${t.accuracy}%` : " · 未挑戰"}
+                      {t.accuracy !== null ? ` · ${t.accuracy}%` : ""}
                     </span>
                   </div>
-                  <div className="h-2.5 w-full overflow-hidden rounded-full bg-[#DDE2EA]">
+                  <div className="h-2 w-full overflow-hidden rounded-full bg-[#070C22]">
                     <div
                       style={{ width: `${pct}%`, backgroundColor: theme.hex }}
                       className="h-full ui-transition"
@@ -186,41 +178,44 @@ export function StudentDashboardClient({ initialData }: StudentDashboardClientPr
           </div>
         </section>
 
-        <section className="lg:col-span-6 synth-panel-hard p-5 sm:p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-lg font-black text-[#11151C]">六大考法雷達墊</h2>
-            <span className="text-xs font-bold text-[#4B5565]">點擊紅燈弱項立即特訓</span>
+        <section className="lg:col-span-6 rail-frame p-4 sm:p-5 space-y-3">
+          <div className="flex items-center justify-between border-b border-white/15 pb-2.5">
+            <h2 className="font-display text-base font-extrabold tracking-wide text-white">
+              題型正確率
+            </h2>
+            <Link
+              href="/practice"
+              className="font-code text-xs font-bold text-[#B8C5E0] hover:text-white"
+            >
+              特訓 →
+            </Link>
           </div>
-          <div className="grid gap-2.5 sm:grid-cols-2">
+          <div className="divide-y divide-white/10">
             {data.typeMastery.map((tm) => (
               <Link
                 key={tm.type}
                 href={`/practice?type=${tm.type}`}
-                className="synth-pad flex items-center justify-between p-3.5"
+                className="flex items-center justify-between py-2.5 px-1.5 hover:bg-white/[0.04] rounded ui-transition text-xs"
               >
-                <div>
-                  <div className="flex items-center gap-1.5">
-                    <span className="rounded bg-[#161A22] px-1.5 py-0.5 font-display text-[10px] font-bold text-white">
-                      {QUESTION_TYPE_PAD_CODES[tm.type]}
-                    </span>
-                    <span className="text-sm font-bold text-[#11151C]">
-                      {tm.label}
-                    </span>
-                  </div>
-                  <div className="mt-1 text-[11px] font-medium text-[#4B5565] tabular-nums">
-                    作答 {tm.attempts} 次（對 {tm.correct}）
-                  </div>
+                <div className="flex items-center gap-2.5">
+                  <span className="rounded bg-white px-1.5 py-0.5 font-code text-[10px] font-bold text-[#0B1230]">
+                    {QUESTION_TYPE_PAD_CODES[tm.type]}
+                  </span>
+                  <span className="font-bold text-white">{tm.label}</span>
+                  <span className="font-code text-[#7E91B8] tabular-nums">
+                    {tm.correct}/{tm.attempts}
+                  </span>
                 </div>
                 <span
-                  className={`font-display text-sm font-bold tabular-nums ${
+                  className={`font-display text-sm font-extrabold tabular-nums ${
                     tm.accuracy === null
-                      ? "text-[#647082]"
+                      ? "text-[#7E91B8]"
                       : tm.accuracy >= 70
-                      ? "text-[#007A57]"
-                      : "text-[#C62828]"
+                      ? "text-[#4ADE80]"
+                      : "text-[#FF7A85]"
                   }`}
                 >
-                  {tm.accuracy !== null ? `${tm.accuracy}%` : "NEW"}
+                  {tm.accuracy !== null ? `${tm.accuracy}%` : "—"}
                 </span>
               </Link>
             ))}
@@ -230,10 +225,11 @@ export function StudentDashboardClient({ initialData }: StudentDashboardClientPr
 
       {/* Classes & Assignments */}
       <div className="grid gap-6 lg:grid-cols-12">
-        <section className="lg:col-span-5 synth-panel-hard p-5 sm:p-6 space-y-4">
-          <div className="flex items-center gap-2">
-            <Users className="h-4 w-4 text-[#D93B09]" strokeWidth={2} />
-            <h2 className="text-lg font-black text-[#11151C]">我的班級與代碼加入</h2>
+        <section className="lg:col-span-5 rail-frame p-4 sm:p-5 space-y-3">
+          <div className="flex items-center justify-between border-b border-white/15 pb-2.5">
+            <h2 className="font-display text-base font-extrabold tracking-wide text-white">
+              所屬班級
+            </h2>
           </div>
 
           <form onSubmit={handleJoinClass} className="flex gap-2">
@@ -241,120 +237,107 @@ export function StudentDashboardClient({ initialData }: StudentDashboardClientPr
               type="text"
               value={joinCode}
               onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
-              placeholder="輸入 6 碼代碼（如 APCS2A）"
-              className="flex-1 rounded-lg border-[1.5px] border-[#C4CBD6] bg-[#F8F9FB] px-3 py-2 font-code text-sm uppercase text-[#11151C] focus:border-[#161A22] focus:bg-white focus:outline-none"
+              placeholder="班級代碼（如 APCS2A）"
+              className="rail-input flex-1 px-3 py-1.5 font-code text-xs uppercase"
             />
             <button
               type="submit"
               disabled={joining || !joinCode.trim()}
-              className="synth-pad-orange inline-flex items-center gap-1 px-3.5 py-2 text-xs font-bold disabled:opacity-45"
+              className="rail-btn-primary inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold disabled:opacity-45"
             >
               <PlusCircle className="h-3.5 w-3.5" strokeWidth={2.2} />
-              <span>{joining ? "加入中..." : "加入"}</span>
+              <span>{joining ? "加入中" : "加入"}</span>
             </button>
           </form>
 
           {joinError && (
-            <div className="flex items-center gap-1.5 rounded-lg border border-[#F9B4B4] bg-[#FDECEC] px-3 py-2 text-xs font-medium text-[#C62828]">
+            <div className="flex items-center gap-1.5 rounded border border-[#E21D2D]/50 bg-[#E21D2D]/15 px-3 py-2 text-xs text-[#FF7A85]">
               <AlertCircle className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
               <span>{joinError}</span>
             </div>
           )}
           {joinSuccess && (
-            <div className="flex items-center gap-1.5 rounded-lg border border-[#9EE7D0] bg-[#E6FAF3] px-3 py-2 text-xs font-medium text-[#007A57]">
+            <div className="flex items-center gap-1.5 rounded border border-[#22B14C]/50 bg-[#22B14C]/15 px-3 py-2 text-xs text-[#4ADE80]">
               <CheckCircle2 className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
               <span>{joinSuccess}</span>
             </div>
           )}
 
           {data.classes.length === 0 ? (
-            <p className="synth-recess p-4 text-xs leading-relaxed text-[#4B5565]">
-              你尚未加入任何班級。向老師索取 6 碼加入代碼後輸入上方欄位，即可同步接收班級作業與專屬題庫。
-            </p>
+            <div className="rail-well p-3 text-xs text-[#7E91B8]">
+              尚無班級，輸入代碼加入
+            </div>
           ) : (
-            <div className="divide-y divide-[#D4DAE4] rounded-xl border border-[#C4CBD6] bg-[#F8F9FB]">
+            <div className="divide-y divide-white/10">
               {data.classes.map((cls) => (
-                <div key={cls.id} className="p-3.5 text-sm">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className="font-bold text-[#11151C]">{cls.name}</span>
-                    <span className="rounded bg-[#161A22] px-2 py-0.5 font-code text-xs font-bold text-white">
-                      {cls.join_code}
-                    </span>
+                <div key={cls.id} className="flex items-center justify-between py-2.5 text-xs">
+                  <div>
+                    <div className="font-bold text-white">{cls.name}</div>
+                    <div className="text-[#7E91B8]">{cls.teacher_name}</div>
                   </div>
-                  <div className="mt-1 text-xs text-[#4B5565]">
-                    授課教師：{cls.teacher_name}
-                  </div>
+                  <span className="rounded bg-[#070C22] border border-white/20 px-2 py-0.5 font-code font-bold text-[#B8C5E0]">
+                    {cls.join_code}
+                  </span>
                 </div>
               ))}
             </div>
           )}
         </section>
 
-        <section className="lg:col-span-7 synth-panel-hard p-5 sm:p-6 space-y-4">
-          <div className="flex items-center gap-2">
-            <ClipboardList className="h-4 w-4 text-[#D93B09]" strokeWidth={2} />
-            <h2 className="text-lg font-black text-[#11151C]">班級指派作業任務</h2>
+        <section className="lg:col-span-7 rail-frame p-4 sm:p-5 space-y-3">
+          <div className="border-b border-white/15 pb-2.5">
+            <h2 className="font-display text-base font-extrabold tracking-wide text-white">
+              班級作業 ({data.assignments.length})
+            </h2>
           </div>
 
           {data.assignments.length === 0 ? (
-            <p className="synth-recess p-4 text-xs leading-relaxed text-[#4B5565]">
-              目前所屬班級尚無指派作業，你可以先自由前往五大模組實驗室或刷題台自主練習。
-            </p>
+            <div className="rail-well p-4 text-xs text-[#7E91B8]">
+              目前無指派作業
+            </div>
           ) : (
-            <div className="space-y-3">
+            <div className="divide-y divide-white/10">
               {data.assignments.map((a) => {
                 const donePct =
                   a.question_count > 0
                     ? Math.round((a.completed_count / a.question_count) * 100)
                     : 0;
                 return (
-                  <div
-                    key={a.id}
-                    className="rounded-xl border border-[#C4CBD6] bg-[#F8F9FB] p-4 space-y-2.5"
-                  >
-                    <div className="flex flex-wrap items-start justify-between gap-2">
-                      <div>
-                        <div className="flex flex-wrap items-center gap-2 text-xs">
-                          <span className="rounded bg-[#161A22] px-2 py-0.5 font-bold text-white">
-                            {a.class_name}
-                          </span>
-                          {a.due_date && (
-                            <span className="font-code text-[#4B5565]">
-                              截止：{a.due_date}
-                            </span>
-                          )}
-                        </div>
-                        <h3 className="mt-1.5 text-sm font-black text-[#11151C]">
+                  <div key={a.id} className="py-3 space-y-2">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <span className="rounded bg-[#070C22] border border-white/20 px-2 py-0.5 font-code text-[11px] font-bold text-[#B8C5E0]">
+                          {a.class_name}
+                        </span>
+                        <span className="text-sm font-bold text-white">
                           {a.title}
-                        </h3>
-                        {a.description && (
-                          <p className="mt-0.5 text-xs text-[#4B5565]">
-                            {a.description}
-                          </p>
+                        </span>
+                        {a.due_date && (
+                          <span className="font-code text-xs text-[#7E91B8]">
+                            截止 {a.due_date}
+                          </span>
                         )}
                       </div>
 
                       <Link
                         href={`/practice?assignmentId=${a.id}`}
-                        className="synth-pad-orange inline-flex items-center gap-1 px-3.5 py-1.5 text-xs font-bold"
+                        className="rail-btn-primary inline-flex items-center gap-1 px-3 py-1 text-xs font-bold"
                       >
                         <span>
-                          {a.completed_count >= a.question_count
-                            ? "檢視／重練"
-                            : "開始作答"}
+                          {a.completed_count >= a.question_count ? "重練" : "作答"}
                         </span>
                         <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.2} />
                       </Link>
                     </div>
 
                     <div className="flex items-center gap-3 text-xs">
-                      <div className="h-2 flex-1 overflow-hidden rounded-full bg-[#DDE2EA]">
+                      <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-[#070C22]">
                         <div
                           style={{ width: `${donePct}%` }}
-                          className="h-full bg-[#00A878]"
+                          className="h-full bg-[#22B14C]"
                         />
                       </div>
-                      <span className="font-code font-bold text-[#4B5565] tabular-nums">
+                      <span className="font-code text-[#B8C5E0] tabular-nums">
                         {a.completed_count}/{a.question_count}（對 {a.correct_count}）
                       </span>
                     </div>
@@ -366,58 +349,55 @@ export function StudentDashboardClient({ initialData }: StudentDashboardClientPr
         </section>
       </div>
 
-      {/* Wrong Questions Replay Queue */}
-      <section className="synth-panel-hard p-5 sm:p-6 space-y-4">
-        <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 className="text-lg font-black text-[#11151C]">待訂正錯題與迷思紀錄</h2>
+      {/* Wrong Questions Queue */}
+      <section className="rail-frame p-4 sm:p-5 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/15 pb-2.5">
+          <h2 className="font-display text-base font-extrabold tracking-wide text-white">
+            待訂正站點 ({data.recentWrong.length})
+          </h2>
           <Link
             href="/practice?status=wrong"
-            className="synth-pad inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold"
+            className="rail-btn inline-flex items-center gap-1 px-3 py-1 text-xs font-bold"
           >
-            <span>一鍵專刷所有錯題</span>
+            <span>專刷錯題</span>
             <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} />
           </Link>
         </div>
 
         {data.recentWrong.length === 0 ? (
-          <div className="synth-recess p-5 text-sm font-bold text-[#007A57]">
-            太強了！目前沒有任何尚未訂正的錯題。
+          <div className="rail-well p-4 text-xs font-bold text-[#4ADE80]">
+            無待訂正錯題
           </div>
         ) : (
-          <div className="divide-y divide-[#D4DAE4] rounded-xl border border-[#C4CBD6] bg-[#F8F9FB]">
+          <div className="divide-y divide-white/10">
             {data.recentWrong.map((w) => (
               <div
                 key={w.attemptId}
-                className="flex flex-wrap items-center justify-between gap-3 p-4 text-sm"
+                className="flex flex-wrap items-center justify-between gap-3 py-3 text-xs"
               >
-                <div className="space-y-1 max-w-3xl">
-                  <div className="flex flex-wrap items-center gap-2 text-xs">
+                <div className="space-y-1 min-w-0 max-w-3xl">
+                  <div className="flex flex-wrap items-center gap-2">
                     {w.officialRef && (
-                      <span className="rounded bg-[#161A22] px-2 py-0.5 font-code font-bold text-white">
+                      <span className="rounded bg-white px-1.5 py-0.5 font-code text-[11px] font-bold text-[#0B1230]">
                         {w.officialRef}
                       </span>
                     )}
-                    <span className="font-bold text-[#11151C]">{w.topicTitle}</span>
-                    <span className="rounded border border-[#C4CBD6] bg-white px-2 py-0.5 text-[#4B5565]">
-                      {QUESTION_TYPE_LABELS[w.questionType]}
-                    </span>
-                    <span className="font-code font-bold text-[#C62828]">
-                      上次誤選 ({w.selectedOption})
+                    <span className="font-bold text-white">{w.title}</span>
+                    <span className="text-[#7E91B8]">{w.topicTitle}</span>
+                    <span className="font-code font-bold text-[#FF7A85]">
+                      誤選 {w.selectedOption}
                     </span>
                   </div>
-                  <div className="font-bold text-[#11151C]">{w.title}</div>
                   {w.misconception && (
-                    <p className="text-xs leading-relaxed text-[#4B5565]">
-                      {w.misconception}
-                    </p>
+                    <p className="text-[#B8C5E0]">{w.misconception}</p>
                   )}
                 </div>
 
                 <Link
                   href={`/practice?topic=${w.topicSlug}&qid=${w.questionId}`}
-                  className="synth-pad inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold"
+                  className="rail-btn inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold shrink-0"
                 >
-                  <span>立即重練追蹤</span>
+                  <span>重練</span>
                   <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} />
                 </Link>
               </div>

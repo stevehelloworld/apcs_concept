@@ -33,54 +33,48 @@ export function RangeLoopVisualizer() {
   });
 
   return (
-    <div className="synth-panel-hard overflow-hidden">
-      <div className="h-2 w-full bg-[#2563EB]" />
-      <div className="p-5 sm:p-6 space-y-5">
-        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#D4DAE4] pb-4">
-          <div>
-            <h3 className="flex items-center gap-2 text-base font-black text-[#11151C]">
-              <span className="rounded bg-[#161A22] px-2 py-0.5 font-display text-xs font-bold text-[#60A5FA]">
-                LAB-02
-              </span>
-              <span>range 尺規與迴圈畫布</span>
-            </h3>
-            <p className="mt-1 text-xs text-[#4B5565]">
-              即時檢驗左閉右開邊界、負步長倒數序列與星號等差規律
-            </p>
+    <div className="rail-frame overflow-hidden">
+      <div className="h-1 w-full bg-[#1E5BFF]" />
+      <div className="p-4 sm:p-5 space-y-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/15 pb-3">
+          <div className="flex items-center gap-2">
+            <span className="rounded bg-[#1E5BFF] px-2 py-0.5 font-code text-xs font-bold text-white">
+              L2
+            </span>
+            <h3 className="text-sm font-black text-white">range 尺規</h3>
           </div>
 
-          <div className="synth-recess flex gap-1 p-1">
+          <div className="rail-well flex gap-1 p-0.5">
             <button
               type="button"
               onClick={() => setTab("ruler")}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold ui-transition ${
+              className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-bold ui-transition ${
                 tab === "ruler"
-                  ? "bg-[#161A22] text-white"
-                  : "text-[#4B5565] hover:text-[#11151C]"
+                  ? "bg-white text-[#0B1230]"
+                  : "text-[#B8C5E0] hover:text-white"
               }`}
             >
               <Ruler className="h-3.5 w-3.5" strokeWidth={2} />
-              <span>range 邊界尺規</span>
+              <span>邊界尺規</span>
             </button>
             <button
               type="button"
               onClick={() => setTab("pyramid")}
-              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold ui-transition ${
+              className={`inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-bold ui-transition ${
                 tab === "pyramid"
-                  ? "bg-[#161A22] text-white"
-                  : "text-[#4B5565] hover:text-[#11151C]"
+                  ? "bg-white text-[#0B1230]"
+                  : "text-[#B8C5E0] hover:text-white"
               }`}
             >
               <Grid3X3 className="h-3.5 w-3.5" strokeWidth={2} />
-              <span>Q5 星號畫布</span>
+              <span>Q5 星號</span>
             </button>
           </div>
         </div>
 
         {tab === "ruler" && (
-          <div className="space-y-4">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="text-xs font-bold text-[#4B5565]">載入經典考題預設：</span>
+          <div className="space-y-3.5">
+            <div className="flex flex-wrap items-center gap-1.5">
               <button
                 type="button"
                 onClick={() => {
@@ -88,9 +82,9 @@ export function RangeLoopVisualizer() {
                   setStop(101);
                   setStep(5);
                 }}
-                className="synth-pad px-2.5 py-1 font-code text-xs font-bold"
+                className="rail-btn px-2.5 py-1 font-code text-xs font-bold"
               >
-                Q26 原錯碼 (0, 101, 5)
+                Q26 (0,101,5)
               </button>
               <button
                 type="button"
@@ -99,9 +93,9 @@ export function RangeLoopVisualizer() {
                   setStop(100);
                   setStep(5);
                 }}
-                className="synth-pad px-2.5 py-1 font-code text-xs font-bold"
+                className="rail-btn px-2.5 py-1 font-code text-xs font-bold"
               >
-                Q26 仍少 1 次 (5, 100, 5)
+                Q26 (5,100,5)
               </button>
               <button
                 type="button"
@@ -110,9 +104,9 @@ export function RangeLoopVisualizer() {
                   setStop(100);
                   setStep(5);
                 }}
-                className="synth-pad px-2.5 py-1 font-code text-xs font-bold"
+                className="rail-btn px-2.5 py-1 font-code text-xs font-bold"
               >
-                Q26 正解 20 次 (0, 100, 5)
+                Q26 正解 (0,100,5)
               </button>
               <button
                 type="button"
@@ -121,72 +115,69 @@ export function RangeLoopVisualizer() {
                   setStop(0);
                   setStep(-1);
                 }}
-                className="synth-pad px-2.5 py-1 font-code text-xs font-bold"
+                className="rail-btn px-2.5 py-1 font-code text-xs font-bold"
               >
-                Q19 負步長 (6, 0, -1)
+                Q19 (6,0,-1)
               </button>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
-              <label className="synth-recess p-3 text-xs">
-                <span className="block font-bold text-[#11151C]">start（起點，含）</span>
+              <label className="rail-well p-3 text-xs">
+                <span className="block font-code font-bold text-[#B8C5E0]">start</span>
                 <input
                   type="number"
                   value={start}
                   onChange={(e) => setStart(Number(e.target.value))}
-                  className="mt-1.5 w-full rounded-lg border-[1.5px] border-[#C4CBD6] bg-white px-2.5 py-1.5 font-code text-sm font-bold text-[#11151C]"
+                  className="rail-input mt-1.5 w-full px-2.5 py-1.5 font-code text-sm font-bold"
                 />
               </label>
-              <label className="synth-recess p-3 text-xs">
-                <span className="block font-bold text-[#11151C]">stop（終點，永遠不含）</span>
+              <label className="rail-well p-3 text-xs">
+                <span className="block font-code font-bold text-[#B8C5E0]">stop (不含)</span>
                 <input
                   type="number"
                   value={stop}
                   onChange={(e) => setStop(Number(e.target.value))}
-                  className="mt-1.5 w-full rounded-lg border-[1.5px] border-[#C4CBD6] bg-white px-2.5 py-1.5 font-code text-sm font-bold text-[#11151C]"
+                  className="rail-input mt-1.5 w-full px-2.5 py-1.5 font-code text-sm font-bold"
                 />
               </label>
-              <label className="synth-recess p-3 text-xs">
-                <span className="block font-bold text-[#11151C]">step（步長，不可為 0）</span>
+              <label className="rail-well p-3 text-xs">
+                <span className="block font-code font-bold text-[#B8C5E0]">step</span>
                 <input
                   type="number"
                   value={step}
                   onChange={(e) => setStep(Number(e.target.value))}
-                  className="mt-1.5 w-full rounded-lg border-[1.5px] border-[#C4CBD6] bg-white px-2.5 py-1.5 font-code text-sm font-bold text-[#11151C]"
+                  className="rail-input mt-1.5 w-full px-2.5 py-1.5 font-code text-sm font-bold"
                 />
               </label>
             </div>
 
-            <div className="synth-oled p-4">
-              <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
-                <span className="font-code text-sm font-bold text-[#38BDF8]">
-                  list(range({start}, {stop}, {step}))
+            <div className="rail-well p-3.5 space-y-2.5">
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <span className="font-code text-xs font-bold text-[#7AA4FF]">
+                  range({start}, {stop}, {step})
                 </span>
-                <span className="rounded bg-[#1D4ED8] px-3 py-0.5 font-code text-xs font-bold text-white tabular-nums">
-                  共執行 {items.length} 次
+                <span className="rounded bg-[#1E5BFF] px-2.5 py-0.5 font-code text-xs font-bold text-white tabular-nums">
+                  {items.length} 次
                 </span>
               </div>
               {step === 0 ? (
-                <p className="font-code text-xs font-bold text-[#FF6B7B]">
-                  ValueError: range() arg 3 must not be zero
+                <p className="font-code text-xs font-bold text-[#FF7A85]">
+                  ValueError: step 不能為 0
                 </p>
               ) : items.length === 0 ? (
-                <p className="font-code text-xs text-[#A8B6CC]">[]（空序列：執行 0 次）</p>
+                <p className="font-code text-xs text-[#7E91B8]">[] (0 次)</p>
               ) : (
                 <div className="flex flex-wrap gap-1.5">
                   {items.map((num, idx) => (
                     <span
                       key={`${num}-${idx}`}
-                      className="rounded-md border border-[#2B3548] bg-[#161B24] px-2.5 py-0.5 font-code text-xs font-bold text-[#4ADE80] tabular-nums"
+                      className="rounded border border-white/20 bg-[#111B45] px-2 py-0.5 font-code text-xs font-bold text-[#4ADE80] tabular-nums"
                     >
                       {num}
                     </span>
                   ))}
-                  <span
-                    className="rounded-md border border-dashed border-[#69778F] px-2.5 py-0.5 font-code text-xs text-[#94A3B8] line-through tabular-nums"
-                    title="stop 邊界值永遠不被包含"
-                  >
-                    {stop} (不含)
+                  <span className="rounded border border-dashed border-white/25 px-2 py-0.5 font-code text-xs text-[#7E91B8] line-through tabular-nums">
+                    {stop}
                   </span>
                 </div>
               )}
@@ -195,43 +186,43 @@ export function RangeLoopVisualizer() {
         )}
 
         {tab === "pyramid" && (
-          <div className="grid gap-5 lg:grid-cols-12">
+          <div className="grid gap-4 lg:grid-cols-12">
             <div className="lg:col-span-6 space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <div className="flex gap-2">
+                <div className="flex gap-1.5">
                   <button
                     type="button"
                     onClick={() => setUseFixedPyramid(false)}
-                    className={`rounded-lg border px-3 py-1.5 text-xs font-bold ${
+                    className={`rounded px-2.5 py-1 font-code text-xs font-bold ui-transition ${
                       !useFixedPyramid
-                        ? "border-[#161A22] bg-[#C62828] text-white"
-                        : "border-[#C4CBD6] bg-white text-[#4B5565]"
+                        ? "bg-[#E21D2D] text-white"
+                        : "border border-white/20 text-[#B8C5E0]"
                     }`}
                   >
-                    原錯碼：m = m + 1
+                    m = m + 1
                   </button>
                   <button
                     type="button"
                     onClick={() => setUseFixedPyramid(true)}
-                    className={`rounded-lg border px-3 py-1.5 text-xs font-bold ${
+                    className={`rounded px-2.5 py-1 font-code text-xs font-bold ui-transition ${
                       useFixedPyramid
-                        ? "border-[#161A22] bg-[#007A57] text-white"
-                        : "border-[#C4CBD6] bg-white text-[#4B5565]"
+                        ? "bg-[#168A3B] text-white"
+                        : "border border-white/20 text-[#B8C5E0]"
                     }`}
                   >
-                    只改第 7 行：m = m + 2
+                    m = m + 2 (正解)
                   </button>
                 </div>
 
-                <label className="flex items-center gap-2 text-xs font-bold text-[#11151C]">
-                  <span>列數：</span>
+                <label className="flex items-center gap-2 text-xs font-bold text-white">
+                  <span>列</span>
                   <input
                     type="range"
                     min={1}
                     max={5}
                     value={rowLimit}
                     onChange={(e) => setRowLimit(Number(e.target.value))}
-                    className="synth-slider w-24"
+                    className="rail-slider w-24"
                   />
                   <span className="font-code tabular-nums">{rowLimit}</span>
                 </label>
@@ -245,25 +236,18 @@ export function RangeLoopVisualizer() {
               />
             </div>
 
-            <div className="lg:col-span-6 space-y-3">
-              <div className="synth-oled p-4">
-                <div className="mb-2 font-code text-xs text-[#94A3B8]">
-                  OLED CANVAS // 金字塔輸出預覽
-                </div>
-                <div className="space-y-1 font-code text-sm">
-                  {pyramidRows.map((r) => (
-                    <div key={r.i} className="flex items-center gap-3">
-                      <span className="w-24 text-xs text-[#7A8AA3] tabular-nums">
-                        i={r.i} k={r.k} m={r.m}
-                      </span>
-                      <pre className="text-[#FFB800] font-bold whitespace-pre">{r.line}</pre>
-                    </div>
-                  ))}
-                </div>
+            <div className="lg:col-span-6 space-y-2.5">
+              <div className="rail-well p-3.5 space-y-1 font-code text-sm">
+                <div className="mb-1.5 text-[11px] text-[#7E91B8]">STDOUT</div>
+                {pyramidRows.map((r) => (
+                  <div key={r.i} className="flex items-center gap-3">
+                    <span className="w-24 text-[11px] text-[#7E91B8] tabular-nums">
+                      i={r.i} k={r.k} m={r.m}
+                    </span>
+                    <pre className="text-[#FFD452] font-bold whitespace-pre">{r.line}</pre>
+                  </div>
+                ))}
               </div>
-              <p className="text-xs leading-relaxed text-[#4B5565]">
-                空白數 k 從 4 遞減到 0 完全正確，唯一誤差在第 7 行每次星號數只加 1 而非加 2，所以最少只需修改 1 行。
-              </p>
             </div>
           </div>
         )}

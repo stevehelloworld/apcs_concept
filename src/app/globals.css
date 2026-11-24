@@ -3,45 +3,34 @@
 :root {
   --font-noto-sans-tc: "Noto Sans TC";
   --font-jetbrains-mono: "JetBrains Mono";
-  --font-display: "Chakra Petch";
+  --font-display: "Barlow Condensed";
 
-  --chassis-bg: #E6E9EE;
-  --panel-bg: #F8F9FB;
-  --panel-white: #FFFFFF;
-  --panel-recess: #DDE2EA;
-  --border-chassis: #C4CBD6;
-  --border-hard: #161A22;
+  /* Fired Midnight-Blue Enamel Palette */
+  --enamel-ground: #0B1230;
+  --enamel-deep: #070C22;
+  --enamel-plate: #111B45;
+  --enamel-hover: #172459;
 
-  --ink-primary: #11151C;
-  --ink-secondary: #4B5565;
-  --ink-muted: #647082;
+  /* Porcelain Inks */
+  --porcelain: #FFFFFF;
+  --porcelain-secondary: #B8C5E0;
+  --porcelain-muted: #7E91B8;
 
-  /* Hardware Signal Accents (WCAG AA compliant with white foregrounds on buttons) */
-  --signal-orange: #FF4F17;
-  --signal-orange-btn: #D93B09;
-  --signal-orange-hover: #BA3005;
-  --signal-orange-soft: #FFF1EC;
+  /* Hairlines */
+  --hairline: rgba(255, 255, 255, 0.22);
+  --hairline-subtle: rgba(255, 255, 255, 0.12);
+  --hairline-strong: rgba(255, 255, 255, 0.55);
 
-  /* Teacher Master Console Accent */
-  --teacher-emerald: #007A5B;
-  --teacher-emerald-hover: #006148;
-  --teacher-emerald-soft: #E6F7F2;
-
-  /* Semantic Status */
-  --status-success: #007A57;
-  --status-success-led: #00C48C;
-  --status-success-bg: #E6FAF3;
-  --status-error: #C62828;
-  --status-error-led: #FF4757;
-  --status-error-bg: #FDECEC;
-  --status-warn: #9A5800;
-  --status-warn-bg: #FFF6E0;
-
-  /* Recessed OLED Surface */
-  --oled-bg: #0D1117;
-  --oled-header: #161B24;
-  --oled-border: #262F3F;
-  --oled-gutter: #69778F;
+  /* Enamel Transit Line Inks */
+  --line-scarlet: #E21D2D;
+  --line-scarlet-hover: #C51624;
+  --line-cobalt: #1E5BFF;
+  --line-cobalt-hover: #1646CC;
+  --line-green: #22B14C;
+  --line-green-btn: #168A3B;
+  --line-green-hover: #127230;
+  --line-amber: #FFC20E;
+  --line-cyan: #14B8C4;
 }
 
 * {
@@ -50,19 +39,19 @@
 
 html,
 body {
-  background-color: var(--chassis-bg);
-  color: var(--ink-primary);
+  background-color: var(--enamel-ground);
+  color: var(--porcelain);
   font-family: var(--font-noto-sans-tc), "Noto Sans TC", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
 ::selection {
-  background-color: var(--signal-orange);
+  background-color: var(--line-cobalt);
   color: #FFFFFF;
 }
 
 a {
-  text-underline-offset: 3px;
+  text-underline-offset: 4px;
 }
 
 .font-code {
@@ -70,7 +59,7 @@ a {
 }
 
 .font-display {
-  font-family: var(--font-display), var(--font-jetbrains-mono), sans-serif;
+  font-family: var(--font-display), var(--font-noto-sans-tc), sans-serif;
   letter-spacing: 0.04em;
 }
 
@@ -78,198 +67,180 @@ a {
   font-variant-numeric: tabular-nums;
 }
 
-/* Precision anodized chassis ground with subtle machined dot matrix */
-.synth-chassis {
-  background-color: var(--chassis-bg);
-  background-image: radial-gradient(rgba(130, 142, 160, 0.34) 1px, transparent 1px);
-  background-size: 20px 20px;
+/* Midnight enamel surface with kiln sheen gradient */
+.rail-ground {
+  background-color: var(--enamel-ground);
+  background-image: radial-gradient(circle at 72% 18%, #132055 0%, #0B1230 60%, #070C22 100%);
 }
 
-/* Machined aluminum secondary module surface */
-.synth-panel {
-  background-color: var(--panel-bg);
-  border: 1.5px solid var(--border-chassis);
-  border-radius: 16px;
-  box-shadow: 0 4px 10px -3px rgba(17, 21, 28, 0.08), inset 0 -2px 0 rgba(196, 203, 214, 0.55);
+/* Porcelain hairline concourse frame */
+.rail-frame {
+  background-color: rgba(11, 18, 48, 0.86);
+  border: 1px solid var(--hairline);
+  border-radius: 6px;
 }
 
-/* Primary active deck / module faceplate */
-.synth-panel-hard {
-  background-color: var(--panel-white);
-  border: 2px solid var(--border-hard);
-  border-radius: 16px;
-  box-shadow: 0 6px 16px -4px rgba(17, 21, 28, 0.14), inset 0 -3px 0 rgba(22, 26, 34, 0.14);
+/* Elevated enamel plate */
+.rail-plate {
+  background-color: var(--enamel-plate);
+  border: 1px solid var(--hairline-subtle);
+  border-radius: 6px;
 }
 
-/* Recessed instrument channel well */
-.synth-recess {
-  background-color: var(--panel-recess);
-  border: 1.5px solid var(--border-chassis);
-  border-radius: 12px;
-  box-shadow: inset 0 2px 5px rgba(17, 21, 28, 0.08);
+/* Recessed deep code & telemetry well */
+.rail-well {
+  background-color: var(--enamel-deep);
+  border: 1px solid var(--hairline-subtle);
+  border-radius: 6px;
 }
 
-/* High-contrast recessed OLED display */
-.synth-oled {
-  background-color: var(--oled-bg);
-  border: 2px solid #1E2533;
-  border-radius: 14px;
-  color: #EEF2F8;
-  box-shadow: inset 0 2px 12px rgba(0, 0, 0, 0.65), 0 3px 10px -3px rgba(13, 17, 23, 0.25);
+/* Sharp transit buttons */
+.rail-btn {
+  background-color: rgba(7, 12, 34, 0.7);
+  color: var(--porcelain);
+  border: 1px solid rgba(255, 255, 255, 0.36);
+  border-radius: 5px;
+  transition: background-color 140ms ease, border-color 140ms ease, color 140ms ease;
 }
 
-/* Tactile pressable hardware keycaps */
-.synth-pad {
-  background-color: #FFFFFF;
-  color: var(--ink-primary);
-  border: 1.5px solid var(--border-hard);
-  border-radius: 10px;
-  box-shadow: 0 3px 6px -2px rgba(17, 21, 28, 0.18), inset 0 -2px 0 rgba(22, 26, 34, 0.14);
-  transition: transform 120ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 120ms ease, background-color 140ms ease, border-color 140ms ease;
+.rail-btn:hover:not(:disabled) {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: var(--porcelain);
 }
 
-.synth-pad:hover:not(:disabled) {
-  background-color: #F3F5F8;
-  transform: translateY(-1px);
-  box-shadow: 0 5px 10px -2px rgba(17, 21, 28, 0.22), inset 0 -2px 0 rgba(22, 26, 34, 0.16);
-}
-
-.synth-pad:active:not(:disabled) {
-  transform: translateY(1.5px);
-  box-shadow: 0 1px 2px rgba(17, 21, 28, 0.16), inset 0 1px 2px rgba(22, 26, 34, 0.14);
-}
-
-.synth-pad-orange {
-  background-color: var(--signal-orange-btn);
+.rail-btn-primary {
+  background-color: var(--line-scarlet);
   color: #FFFFFF;
-  border: 1.5px solid var(--border-hard);
-  border-radius: 10px;
-  box-shadow: 0 4px 8px -2px rgba(217, 59, 9, 0.34), inset 0 -2.5px 0 rgba(17, 21, 28, 0.25);
-  transition: transform 120ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 120ms ease, background-color 140ms ease;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 5px;
+  transition: background-color 140ms ease, border-color 140ms ease;
 }
 
-.synth-pad-orange:hover:not(:disabled) {
-  background-color: var(--signal-orange-hover);
-  transform: translateY(-1px);
-  box-shadow: 0 6px 12px -2px rgba(217, 59, 9, 0.42), inset 0 -2.5px 0 rgba(17, 21, 28, 0.28);
+.rail-btn-primary:hover:not(:disabled) {
+  background-color: var(--line-scarlet-hover);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
-.synth-pad-orange:active:not(:disabled) {
-  transform: translateY(1.5px);
-  box-shadow: 0 1px 3px rgba(17, 21, 28, 0.2), inset 0 1px 2px rgba(17, 21, 28, 0.25);
-}
-
-.synth-pad-emerald {
-  background-color: var(--teacher-emerald);
+.rail-btn-green {
+  background-color: var(--line-green-btn);
   color: #FFFFFF;
-  border: 1.5px solid var(--border-hard);
-  border-radius: 10px;
-  box-shadow: 0 4px 8px -2px rgba(0, 122, 91, 0.3), inset 0 -2.5px 0 rgba(17, 21, 28, 0.25);
-  transition: transform 120ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 120ms ease, background-color 140ms ease;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 5px;
+  transition: background-color 140ms ease, border-color 140ms ease;
 }
 
-.synth-pad-emerald:hover:not(:disabled) {
-  background-color: var(--teacher-emerald-hover);
-  transform: translateY(-1px);
+.rail-btn-green:hover:not(:disabled) {
+  background-color: var(--line-green-hover);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
-.synth-pad-emerald:active:not(:disabled) {
-  transform: translateY(1.5px);
-}
-
-.synth-pad-dark {
-  background-color: #161A22;
+.rail-btn-cobalt {
+  background-color: var(--line-cobalt);
   color: #FFFFFF;
-  border: 1.5px solid #090C10;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px -2px rgba(17, 21, 28, 0.3), inset 0 -2px 0 rgba(255, 255, 255, 0.08);
-  transition: transform 120ms cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 120ms ease, background-color 140ms ease;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 5px;
+  transition: background-color 140ms ease, border-color 140ms ease;
 }
 
-.synth-pad-dark:hover:not(:disabled) {
-  background-color: #222834;
-  transform: translateY(-1px);
+.rail-btn-cobalt:hover:not(:disabled) {
+  background-color: var(--line-cobalt-hover);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
-/* Custom Hardware Fader Slider */
-input[type="range"].synth-slider {
+/* Deep recessed dark inputs & selects */
+.rail-input {
+  background-color: var(--enamel-deep);
+  color: var(--porcelain);
+  border: 1px solid rgba(255, 255, 255, 0.26);
+  border-radius: 5px;
+  transition: border-color 140ms ease, background-color 140ms ease;
+}
+
+.rail-input::placeholder {
+  color: var(--porcelain-muted);
+}
+
+.rail-input:focus {
+  outline: none;
+  border-color: var(--line-cobalt);
+  background-color: #09102D;
+}
+
+.rail-input option {
+  background-color: #0B1230;
+  color: #FFFFFF;
+}
+
+/* Transit fader slider */
+input[type="range"].rail-slider {
   -webkit-appearance: none;
   appearance: none;
-  height: 10px;
+  height: 6px;
   border-radius: 999px;
-  background: #D1D7E1;
-  border: 1px solid #B1BAC7;
-  box-shadow: inset 0 1px 3px rgba(17, 21, 28, 0.16);
+  background: #1A275C;
+  border: 1px solid rgba(255, 255, 255, 0.18);
   cursor: pointer;
 }
 
-input[type="range"].synth-slider::-webkit-slider-thumb {
+input[type="range"].rail-slider::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  background: var(--signal-orange);
-  border: 2px solid #161A22;
-  box-shadow: 0 2px 5px rgba(17, 21, 28, 0.3);
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #FFFFFF;
+  border: 3px solid var(--line-scarlet);
   transition: transform 100ms ease;
 }
 
-input[type="range"].synth-slider::-webkit-slider-thumb:hover {
-  transform: scale(1.08);
+input[type="range"].rail-slider::-webkit-slider-thumb:hover {
+  transform: scale(1.1);
 }
 
-input[type="range"].synth-slider::-moz-range-thumb {
-  width: 22px;
-  height: 22px;
-  border-radius: 6px;
-  background: var(--signal-orange);
-  border: 2px solid #161A22;
-  box-shadow: 0 2px 5px rgba(17, 21, 28, 0.3);
+input[type="range"].rail-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: #FFFFFF;
+  border: 3px solid var(--line-scarlet);
 }
 
-/* Custom scrollbars */
+/* Dark enamel scrollbars */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--chassis-bg);
+  background: var(--enamel-deep);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #A9B3C2;
+  background: #273873;
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #7D8899;
+  background: #3B529E;
 }
 
 :focus-visible {
-  outline: 2.5px solid var(--signal-orange-btn);
+  outline: 2px solid var(--line-amber);
   outline-offset: 2px;
 }
 
 .ui-transition {
-  transition-property: color, background-color, border-color, box-shadow, opacity, transform;
-  transition-duration: 160ms;
+  transition-property: color, background-color, border-color, opacity, transform;
+  transition-duration: 150ms;
   transition-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .synth-pad,
-  .synth-pad-orange,
-  .synth-pad-emerald,
-  .synth-pad-dark,
+  .rail-btn,
+  .rail-btn-primary,
+  .rail-btn-green,
+  .rail-btn-cobalt,
   .ui-transition {
     transition: none;
-  }
-  .synth-pad:hover:not(:disabled),
-  .synth-pad-orange:hover:not(:disabled),
-  .synth-pad-emerald:hover:not(:disabled),
-  .synth-pad-dark:hover:not(:disabled) {
-    transform: none;
   }
 }

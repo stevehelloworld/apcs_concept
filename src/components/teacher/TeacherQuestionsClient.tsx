@@ -93,7 +93,7 @@ export function TeacherQuestionsClient({
       id: null,
       topic_id: q.topic_id,
       official_ref: q.official_ref ? `${q.official_ref}-變體` : "",
-      title: `${q.title}（改編題）`,
+      title: `${q.title}（改編）`,
       prompt: q.prompt,
       code: q.code,
       question_type: q.question_type,
@@ -148,10 +148,10 @@ export function TeacherQuestionsClient({
       const saved = json.question as QuestionRecord;
       if (isNew) {
         setQuestions((prev) => [...prev, saved]);
-        setFeedback("已新增自訂題目。");
+        setFeedback("已新增題目");
       } else {
         setQuestions((prev) => prev.map((x) => (x.id === saved.id ? saved : x)));
-        setFeedback("已更新題目內容。");
+        setFeedback("已更新題目");
       }
       setEditing(null);
     } finally {
@@ -172,7 +172,7 @@ export function TeacherQuestionsClient({
   }
 
   async function handleDelete(q: QuestionRecord) {
-    if (!confirm(`確定要刪除自訂題目「${q.title}」嗎？`)) return;
+    if (!confirm(`確定刪除「${q.title}」？`)) return;
     const res = await fetch(`/api/teacher/questions/${q.id}`, { method: "DELETE" });
     if (res.ok) {
       setQuestions((prev) => prev.filter((x) => x.id !== q.id));
@@ -183,13 +183,15 @@ export function TeacherQuestionsClient({
   }
 
   return (
-    <div className="space-y-6">
-      <section className="synth-panel-hard p-5 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black text-[#11151C]">題庫與迷思 CRUD 管理</h1>
-          <p className="mt-1 text-sm text-[#4B5565]">
-            新增班級專屬變體題、複製官方題微調選項，並為每個錯誤選項填寫迷思診斷。
-          </p>
+    <div className="space-y-5">
+      <header className="flex flex-wrap items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
+          <h1 className="font-display text-2xl font-extrabold tracking-wide text-white">
+            題庫管理
+          </h1>
+          <span className="font-code text-xs text-[#7E91B8] tabular-nums">
+            {filtered.length} 題
+          </span>
         </div>
 
         <button
@@ -198,49 +200,45 @@ export function TeacherQuestionsClient({
             setError(null);
             setEditing(makeEmptyQuestion(topics[0]?.id ?? 1));
           }}
-          className="synth-pad-emerald inline-flex items-center gap-1.5 px-4 py-2 text-sm font-bold"
+          className="rail-btn-green inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold"
         >
-          <Plus className="h-4 w-4" strokeWidth={2} />
-          <span>新增自訂題目</span>
+          <Plus className="h-3.5 w-3.5" strokeWidth={2.2} />
+          <span>新增自訂題</span>
         </button>
-      </section>
+      </header>
 
       {feedback && (
-        <div className="rounded-xl border border-[#9EE7D0] bg-[#E6FAF3] px-4 py-3 text-xs font-bold text-[#007A57]">
+        <div className="rounded border border-[#22B14C]/55 bg-[#22B14C]/15 px-3.5 py-2 text-xs font-bold text-[#4ADE80]">
           {feedback}
         </div>
       )}
       {error && !editing && (
-        <div className="rounded-xl border border-[#F9B4B4] bg-[#FDECEC] px-4 py-3 text-xs font-bold text-[#C62828]">
+        <div className="rounded border border-[#E21D2D]/55 bg-[#E21D2D]/15 px-3.5 py-2 text-xs font-bold text-[#FF7A85]">
           {error}
         </div>
       )}
 
       {/* Editor Panel */}
       {editing && (
-        <form onSubmit={handleSave} className="synth-panel-hard p-5 space-y-5">
-          <div className="flex items-center justify-between border-b border-[#D4DAE4] pb-3">
-            <h2 className="text-base font-black text-[#007A5B]">
+        <form onSubmit={handleSave} className="rail-frame p-4 sm:p-5 space-y-4">
+          <div className="flex items-center justify-between border-b border-white/15 pb-3">
+            <h2 className="text-base font-black text-[#4ADE80]">
               {editing.id ? `編輯題目 #${editing.id}` : "新增題目"}
             </h2>
-            <button
-              type="button"
-              onClick={() => setEditing(null)}
-              className="rounded-lg p-1.5 text-[#4B5565] hover:bg-[#DDE2EA]"
-            >
+            <button type="button" onClick={() => setEditing(null)} className="rail-btn p-1">
               <X className="h-4 w-4" strokeWidth={2} />
             </button>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             <label className="text-xs">
-              <span className="mb-1 block font-bold text-[#4B5565]">所屬主題</span>
+              <span className="mb-1 block font-bold text-[#B8C5E0]">路線</span>
               <select
                 value={editing.topic_id}
                 onChange={(e) =>
                   setEditing({ ...editing, topic_id: Number(e.target.value) })
                 }
-                className="w-full rounded-xl border-[1.5px] border-[#C4CBD6] bg-[#F8F9FB] px-2.5 py-2 text-sm text-[#11151C]"
+                className="rail-input w-full px-2.5 py-1.5 text-xs"
               >
                 {topics.map((t) => (
                   <option key={t.id} value={t.id}>
@@ -251,13 +249,13 @@ export function TeacherQuestionsClient({
             </label>
 
             <label className="text-xs">
-              <span className="mb-1 block font-bold text-[#4B5565]">考法題型</span>
+              <span className="mb-1 block font-bold text-[#B8C5E0]">題型</span>
               <select
                 value={editing.question_type}
                 onChange={(e) =>
                   setEditing({ ...editing, question_type: e.target.value as QuestionType })
                 }
-                className="w-full rounded-xl border-[1.5px] border-[#C4CBD6] bg-[#F8F9FB] px-2.5 py-2 text-sm text-[#11151C]"
+                className="rail-input w-full px-2.5 py-1.5 text-xs"
               >
                 {(Object.keys(QUESTION_TYPE_LABELS) as QuestionType[]).map((qt) => (
                   <option key={qt} value={qt}>
@@ -268,13 +266,13 @@ export function TeacherQuestionsClient({
             </label>
 
             <label className="text-xs">
-              <span className="mb-1 block font-bold text-[#4B5565]">難度</span>
+              <span className="mb-1 block font-bold text-[#B8C5E0]">難度</span>
               <select
                 value={editing.difficulty}
                 onChange={(e) =>
                   setEditing({ ...editing, difficulty: e.target.value as Difficulty })
                 }
-                className="w-full rounded-xl border-[1.5px] border-[#C4CBD6] bg-[#F8F9FB] px-2.5 py-2 text-sm text-[#11151C]"
+                className="rail-input w-full px-2.5 py-1.5 text-xs"
               >
                 {(Object.keys(DIFFICULTY_LABELS) as Difficulty[]).map((d) => (
                   <option key={d} value={d}>
@@ -285,13 +283,13 @@ export function TeacherQuestionsClient({
             </label>
 
             <label className="text-xs">
-              <span className="mb-1 block font-bold text-[#4B5565]">可見範圍</span>
+              <span className="mb-1 block font-bold text-[#B8C5E0]">可見範圍</span>
               <select
                 value={editing.class_id}
                 onChange={(e) => setEditing({ ...editing, class_id: e.target.value })}
-                className="w-full rounded-xl border-[1.5px] border-[#C4CBD6] bg-[#F8F9FB] px-2.5 py-2 text-sm text-[#11151C]"
+                className="rail-input w-full px-2.5 py-1.5 text-xs"
               >
-                <option value="">全體公開題庫</option>
+                <option value="">全體公開</option>
                 {classes.map((c) => (
                   <option key={c.id} value={c.id}>
                     班級專屬：{c.name}
@@ -303,24 +301,24 @@ export function TeacherQuestionsClient({
 
           <div className="grid gap-3 sm:grid-cols-4">
             <label className="text-xs sm:col-span-3">
-              <span className="mb-1 block font-bold text-[#4B5565]">題目標題</span>
+              <span className="mb-1 block font-bold text-[#B8C5E0]">標題</span>
               <input
                 type="text"
                 required
                 value={editing.title}
                 onChange={(e) => setEditing({ ...editing, title: e.target.value })}
-                placeholder="例如：負步長 range 迴圈次數變體題"
-                className="w-full rounded-xl border-[1.5px] border-[#C4CBD6] bg-[#F8F9FB] px-3 py-2 text-sm text-[#11151C]"
+                placeholder="題目標題"
+                className="rail-input w-full px-3 py-1.5 text-xs"
               />
             </label>
             <label className="text-xs">
-              <span className="mb-1 block font-bold text-[#4B5565]">參考編號（選填）</span>
+              <span className="mb-1 block font-bold text-[#B8C5E0]">編號</span>
               <input
                 type="text"
                 value={editing.official_ref}
                 onChange={(e) => setEditing({ ...editing, official_ref: e.target.value })}
-                placeholder="如 CUSTOM-01"
-                className="w-full rounded-xl border-[1.5px] border-[#C4CBD6] bg-[#F8F9FB] px-3 py-2 font-code text-sm text-[#11151C]"
+                placeholder="CUSTOM-01"
+                className="rail-input w-full px-3 py-1.5 font-code text-xs"
               />
             </label>
           </div>
@@ -328,42 +326,39 @@ export function TeacherQuestionsClient({
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="space-y-3">
               <label className="block text-xs">
-                <span className="mb-1 block font-bold text-[#4B5565]">題幹敘述</span>
+                <span className="mb-1 block font-bold text-[#B8C5E0]">題幹</span>
                 <textarea
                   required
                   rows={4}
                   value={editing.prompt}
                   onChange={(e) => setEditing({ ...editing, prompt: e.target.value })}
-                  className="w-full rounded-xl border-[1.5px] border-[#C4CBD6] bg-[#F8F9FB] p-3 text-sm text-[#11151C]"
+                  className="rail-input w-full p-2.5 text-xs"
                 />
               </label>
 
               <label className="block text-xs">
-                <span className="mb-1 block font-bold text-[#4B5565]">Python 程式碼</span>
+                <span className="mb-1 block font-bold text-[#B8C5E0]">Python 程式碼</span>
                 <textarea
                   required
                   rows={7}
                   value={editing.code}
                   onChange={(e) => setEditing({ ...editing, code: e.target.value })}
-                  className="w-full rounded-xl border border-[#262F3F] bg-[#0D1117] p-3 font-code text-xs text-[#EEF2F8]"
+                  className="rail-input w-full p-2.5 font-code text-xs"
                 />
               </label>
             </div>
 
-            <div className="space-y-2">
-              <div className="text-xs font-bold text-[#4B5565]">即時程式碼預覽</div>
+            <div className="space-y-1.5">
+              <div className="font-code text-[11px] font-bold text-[#7E91B8]">預覽</div>
               <PythonCodeView code={editing.code} compact />
             </div>
           </div>
 
-          {/* 4 Options + Correct Selector */}
-          <div className="space-y-2.5">
-            <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-[#4B5565]">
-                四個選項與對應迷思診斷說明
-              </span>
-              <label className="text-xs font-bold text-[#007A5B]">
-                正確答案：
+          <div className="space-y-2">
+            <div className="flex items-center justify-between text-xs">
+              <span className="font-bold text-[#B8C5E0]">選項與迷思診斷</span>
+              <label className="font-bold text-[#4ADE80]">
+                正解：
                 <select
                   value={editing.correct_option}
                   onChange={(e) =>
@@ -372,7 +367,7 @@ export function TeacherQuestionsClient({
                       correct_option: e.target.value as "A" | "B" | "C" | "D",
                     })
                   }
-                  className="ml-1.5 rounded-lg border border-[#007A5B] bg-[#E6F7F2] px-2.5 py-1 font-code text-xs"
+                  className="rail-input ml-1.5 px-2 py-0.5 font-code text-xs"
                 >
                   <option value="A">A</option>
                   <option value="B">B</option>
@@ -386,14 +381,14 @@ export function TeacherQuestionsClient({
               {editing.options.map((opt, idx) => (
                 <div
                   key={opt.key}
-                  className={`rounded-xl border p-3 space-y-2 ${
+                  className={`rounded border p-2.5 space-y-1.5 ${
                     editing.correct_option === opt.key
-                      ? "border-[#007A57] bg-[#E6FAF3]"
-                      : "border-[#C4CBD6] bg-[#F8F9FB]"
+                      ? "border-[#22B14C] bg-[#22B14C]/12"
+                      : "border-white/15 bg-[#070C22]"
                   }`}
                 >
                   <div className="flex items-center gap-2">
-                    <span className="font-code text-xs font-bold text-[#11151C]">
+                    <span className="font-code text-xs font-bold text-white">
                       ({opt.key})
                     </span>
                     <input
@@ -405,8 +400,8 @@ export function TeacherQuestionsClient({
                         next[idx] = { ...opt, text: e.target.value };
                         setEditing({ ...editing, options: next });
                       }}
-                      placeholder={`選項 ${opt.key} 內容`}
-                      className="flex-1 rounded-lg border border-[#C4CBD6] bg-white px-2.5 py-1 font-code text-xs"
+                      placeholder={`選項 ${opt.key}`}
+                      className="rail-input flex-1 px-2 py-1 font-code text-xs"
                     />
                   </div>
                   <input
@@ -417,8 +412,8 @@ export function TeacherQuestionsClient({
                       next[idx] = { ...opt, misconception: e.target.value };
                       setEditing({ ...editing, options: next });
                     }}
-                    placeholder="學生選此項時的迷思診斷回饋（建議填寫）"
-                    className="w-full rounded-lg border border-[#C4CBD6] bg-white px-2.5 py-1 text-xs"
+                    placeholder="迷思診斷回饋"
+                    className="rail-input w-full px-2 py-1 text-xs"
                   />
                 </div>
               ))}
@@ -426,46 +421,47 @@ export function TeacherQuestionsClient({
           </div>
 
           <label className="block text-xs">
-            <span className="mb-1 block font-bold text-[#4B5565]">完整考場詳解</span>
+            <span className="mb-1 block font-bold text-[#B8C5E0]">詳解</span>
             <textarea
               required
               rows={3}
               value={editing.explanation}
               onChange={(e) => setEditing({ ...editing, explanation: e.target.value })}
-              className="w-full rounded-xl border-[1.5px] border-[#C4CBD6] bg-[#F8F9FB] p-3 text-sm text-[#11151C]"
+              className="rail-input w-full p-2.5 text-xs"
             />
           </label>
 
-          {error && <p className="text-xs font-bold text-[#C62828]">{error}</p>}
+          {error && <p className="text-xs font-bold text-[#FF7A85]">{error}</p>}
 
-          <div className="flex items-center justify-end gap-2 border-t border-[#D4DAE4] pt-4">
+          <div className="flex items-center justify-end gap-2 border-t border-white/15 pt-3">
             <button
               type="button"
               onClick={() => setEditing(null)}
-              className="synth-pad px-4 py-2 text-xs font-bold"
+              className="rail-btn px-3.5 py-1.5 text-xs font-bold"
             >
               取消
             </button>
             <button
               type="submit"
               disabled={saving}
-              className="synth-pad-emerald inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold disabled:opacity-50"
+              className="rail-btn-green inline-flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold disabled:opacity-50"
             >
               <Save className="h-3.5 w-3.5" strokeWidth={2} />
-              <span>{saving ? "儲存中..." : "儲存題目"}</span>
+              <span>{saving ? "儲存中" : "儲存"}</span>
             </button>
           </div>
         </form>
       )}
 
-      {/* Filters */}
-      <div className="synth-panel flex flex-wrap items-center gap-3 p-3.5 text-xs">
+      {/* Filter Bar */}
+      <div className="flex flex-wrap items-center gap-2.5 text-xs">
         <select
+          aria-label="篩選路線"
           value={topicFilter}
           onChange={(e) => setTopicFilter(e.target.value)}
-          className="rounded-lg border-[1.5px] border-[#C4CBD6] bg-white px-2.5 py-1.5 text-sm font-medium text-[#11151C]"
+          className="rail-input px-3 py-1.5 font-bold"
         >
-          <option value="all">全部主題 ({questions.length})</option>
+          <option value="all">全部路線 ({questions.length})</option>
           {topics.map((t) => (
             <option key={t.id} value={String(t.id)}>
               {t.title}
@@ -473,20 +469,20 @@ export function TeacherQuestionsClient({
           ))}
         </select>
 
-        <div className="synth-recess flex gap-1 p-1">
+        <div className="rail-well flex gap-1 p-0.5">
           {[
-            { key: "all", label: "全部來源" },
-            { key: "global", label: "官方範例 30 題" },
-            { key: "custom", label: "教師自建／改編題" },
+            { key: "all", label: "全部" },
+            { key: "global", label: "官方 30 題" },
+            { key: "custom", label: "自建題" },
           ].map((item) => (
             <button
               key={item.key}
               type="button"
               onClick={() => setScopeFilter(item.key as "all" | "global" | "custom")}
-              className={`rounded-lg px-3 py-1 font-bold ui-transition ${
+              className={`rounded px-2.5 py-1 font-bold ui-transition ${
                 scopeFilter === item.key
-                  ? "bg-[#161A22] text-white"
-                  : "text-[#4B5565] hover:text-[#11151C]"
+                  ? "bg-white text-[#0B1230]"
+                  : "text-[#B8C5E0] hover:text-white"
               }`}
             >
               {item.label}
@@ -495,61 +491,59 @@ export function TeacherQuestionsClient({
         </div>
       </div>
 
-      {/* Question Table */}
-      <div className="synth-panel-hard overflow-x-auto">
+      {/* Timetable */}
+      <div className="rail-frame overflow-x-auto">
         <table className="w-full border-collapse text-xs">
           <thead>
-            <tr className="border-b border-[#C4CBD6] bg-[#161A22] text-white">
+            <tr className="border-b border-white/15 bg-[#070C22] text-[#B8C5E0]">
               <th className="px-3.5 py-2.5 text-left font-bold">編號 / 標題</th>
-              <th className="px-3.5 py-2.5 text-left font-bold">主題</th>
-              <th className="px-3.5 py-2.5 text-left font-bold">題型</th>
-              <th className="px-3.5 py-2.5 text-left font-bold">可見範圍</th>
-              <th className="px-3.5 py-2.5 text-center font-bold">答案</th>
-              <th className="px-3.5 py-2.5 text-center font-bold">狀態</th>
+              <th className="px-3 py-2.5 text-left font-bold">路線</th>
+              <th className="px-3 py-2.5 text-left font-bold">題型</th>
+              <th className="px-3 py-2.5 text-left font-bold">範圍</th>
+              <th className="px-3 py-2.5 text-center font-bold">正解</th>
+              <th className="px-3 py-2.5 text-center font-bold">狀態</th>
               <th className="px-3.5 py-2.5 text-right font-bold">操作</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-[#D4DAE4] bg-white">
+          <tbody className="divide-y divide-white/10">
             {filtered.map((q) => (
-              <tr key={q.id} className="hover:bg-[#F8F9FB]">
+              <tr key={q.id} className="hover:bg-white/[0.03]">
                 <td className="px-3.5 py-2.5">
                   <div className="flex items-center gap-2">
-                    <span className="rounded bg-[#161A22] px-1.5 py-0.5 font-code text-[11px] font-bold text-white">
+                    <span className="rounded bg-white px-1.5 py-0.5 font-code text-[11px] font-bold text-[#0B1230]">
                       {q.official_ref ?? `#${q.id}`}
                     </span>
-                    <span className="font-bold text-[#11151C]">{q.title}</span>
+                    <span className="font-bold text-white">{q.title}</span>
                   </div>
                 </td>
-                <td className="px-3.5 py-2.5 text-[#4B5565]">{q.topic_title}</td>
-                <td className="px-3.5 py-2.5 text-[#4B5565]">
+                <td className="px-3 py-2.5 text-[#B8C5E0]">{q.topic_title}</td>
+                <td className="px-3 py-2.5 text-[#B8C5E0]">
                   {QUESTION_TYPE_LABELS[q.question_type]}
                 </td>
-                <td className="px-3.5 py-2.5">
+                <td className="px-3 py-2.5">
                   {q.class_name ? (
-                    <span className="rounded bg-[#E6F7F2] px-2 py-0.5 font-bold text-[#007A5B]">
-                      {q.class_name}
-                    </span>
+                    <span className="font-bold text-[#4ADE80]">{q.class_name}</span>
                   ) : (
-                    <span className="text-[#647082]">全體公開</span>
+                    <span className="text-[#7E91B8]">公開</span>
                   )}
                 </td>
-                <td className="px-3.5 py-2.5 text-center font-code font-bold text-[#11151C]">
+                <td className="px-3 py-2.5 text-center font-code font-bold text-white">
                   {q.correct_option}
                 </td>
-                <td className="px-3.5 py-2.5 text-center">
+                <td className="px-3 py-2.5 text-center">
                   <button
                     type="button"
                     onClick={() => handleTogglePublish(q)}
-                    className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 font-bold ${
+                    className={`inline-flex items-center gap-1 rounded px-2 py-0.5 font-bold ${
                       q.is_published
-                        ? "bg-[#E6FAF3] text-[#007A57]"
-                        : "bg-[#DDE2EA] text-[#4B5565]"
+                        ? "bg-[#22B14C]/18 text-[#4ADE80]"
+                        : "bg-white/10 text-[#7E91B8]"
                     }`}
                   >
                     {q.is_published ? (
                       <>
                         <Eye className="h-3 w-3" strokeWidth={2} />
-                        <span>已發佈</span>
+                        <span>公開</span>
                       </>
                     ) : (
                       <>
@@ -564,16 +558,16 @@ export function TeacherQuestionsClient({
                     <button
                       type="button"
                       onClick={() => startClone(q)}
-                      title="複製並改編為新題"
-                      className="rounded-lg border border-[#C4CBD6] bg-white p-1.5 text-[#4B5565] hover:border-[#007A5B] hover:text-[#007A5B]"
+                      title="複製改編"
+                      className="rail-btn p-1 text-[#B8C5E0] hover:text-white"
                     >
                       <CopyPlus className="h-3.5 w-3.5" strokeWidth={2} />
                     </button>
                     <button
                       type="button"
                       onClick={() => startEdit(q)}
-                      title="編輯題目"
-                      className="rounded-lg border border-[#C4CBD6] bg-white p-1.5 text-[#4B5565] hover:border-[#007A5B] hover:text-[#007A5B]"
+                      title="編輯"
+                      className="rail-btn p-1 text-[#B8C5E0] hover:text-[#4ADE80]"
                     >
                       <Edit3 className="h-3.5 w-3.5" strokeWidth={2} />
                     </button>
@@ -581,8 +575,8 @@ export function TeacherQuestionsClient({
                       <button
                         type="button"
                         onClick={() => handleDelete(q)}
-                        title="刪除自訂題目"
-                        className="rounded-lg border border-[#C4CBD6] bg-white p-1.5 text-[#C62828] hover:bg-[#FDECEC]"
+                        title="刪除"
+                        className="rail-btn p-1 text-[#FF7A85]"
                       >
                         <Trash2 className="h-3.5 w-3.5" strokeWidth={2} />
                       </button>

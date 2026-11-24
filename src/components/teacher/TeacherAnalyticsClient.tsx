@@ -16,10 +16,10 @@ const ALL_TYPES: QuestionType[] = [
 ];
 
 function getCellBadgeStyle(accuracy: number | null): string {
-  if (accuracy === null) return "bg-[#F8F9FB] text-[#647082] border-[#C4CBD6]";
-  if (accuracy >= 80) return "bg-[#E6FAF3] text-[#007A57] border-[#9EE7D0]";
-  if (accuracy >= 55) return "bg-[#FFF6E0] text-[#9A5800] border-[#FCD47A]";
-  return "bg-[#FDECEC] text-[#C62828] border-[#F9B4B4]";
+  if (accuracy === null) return "bg-[#070C22] text-[#7E91B8] border-white/12";
+  if (accuracy >= 80) return "bg-[#22B14C]/20 text-[#4ADE80] border-[#22B14C]/45";
+  if (accuracy >= 55) return "bg-[#FFC20E]/18 text-[#FFD452] border-[#FFC20E]/45";
+  return "bg-[#E21D2D]/22 text-[#FF7A85] border-[#E21D2D]/45";
 }
 
 export function TeacherAnalyticsClient({
@@ -50,37 +50,32 @@ export function TeacherAnalyticsClient({
 
   return (
     <div className="space-y-6">
-      {/* Top Bar */}
-      <section className="synth-panel-hard p-5 flex flex-wrap items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-black text-[#11151C]">班級識讀數據總覽</h1>
-          <p className="mt-1 text-sm text-[#4B5565]">
-            僅統計您本人所屬班級學生的真實作答數據（嚴格班級隔離）
-          </p>
-        </div>
+      {/* Header */}
+      <header className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="font-display text-2xl font-extrabold tracking-wide text-white">
+          班級數據總覽
+        </h1>
 
         <div className="flex flex-wrap items-center gap-2">
-          <label className="text-xs font-bold text-[#4B5565]">
-            篩選班級：
-            <select
-              value={selectedClass}
-              disabled={loading}
-              onChange={(e) => handleClassChange(e.target.value)}
-              className="ml-2 rounded-lg border-[1.5px] border-[#C4CBD6] bg-white px-3 py-1.5 text-sm font-medium text-[#11151C]"
-            >
-              <option value="all">名下所有班級 ({data.classes.length})</option>
-              {data.classes.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name} ({c.join_code})
-                </option>
-              ))}
-            </select>
-          </label>
+          <select
+            aria-label="篩選班級"
+            value={selectedClass}
+            disabled={loading}
+            onChange={(e) => handleClassChange(e.target.value)}
+            className="rail-input px-3 py-1.5 text-xs font-bold"
+          >
+            <option value="all">全部班級 ({data.classes.length})</option>
+            {data.classes.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name} ({c.join_code})
+              </option>
+            ))}
+          </select>
           <button
             type="button"
             onClick={() => handleClassChange(selectedClass)}
             disabled={loading}
-            className="synth-pad inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
+            className="rail-btn inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold"
           >
             <RefreshCw
               className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`}
@@ -89,58 +84,58 @@ export function TeacherAnalyticsClient({
             <span>同步</span>
           </button>
         </div>
-      </section>
+      </header>
 
-      {/* Recessed OLED KPI Telemetry Strip */}
-      <section className="synth-oled grid gap-4 p-5 sm:grid-cols-2 lg:grid-cols-4 lg:divide-x lg:divide-[#262F3F]">
-        <div className="lg:pr-4">
-          <div className="font-display text-3xl font-bold text-[#00E5A0] tabular-nums">
-            {data.kpis.studentCount} 人
+      {/* 4-Column KPI Strip */}
+      <section className="rail-frame grid grid-cols-2 lg:grid-cols-4 divide-y lg:divide-y-0 lg:divide-x divide-white/15">
+        <div className="p-4">
+          <div className="font-code text-[11px] font-bold text-[#7E91B8]">學生</div>
+          <div className="mt-1 font-display text-3xl font-extrabold text-[#4ADE80] tabular-nums">
+            {data.kpis.studentCount}
           </div>
-          <div className="mt-1 text-xs font-bold text-[#A8B6CC]">所屬學生總數</div>
         </div>
-        <div className="lg:px-4">
-          <div className="font-display text-3xl font-bold text-white tabular-nums">
-            {data.kpis.totalAttempts} 筆
+        <div className="p-4">
+          <div className="font-code text-[11px] font-bold text-[#7E91B8]">作答</div>
+          <div className="mt-1 font-display text-3xl font-extrabold text-white tabular-nums">
+            {data.kpis.totalAttempts}
           </div>
-          <div className="mt-1 text-xs font-bold text-[#A8B6CC]">累計作答筆數</div>
         </div>
-        <div className="lg:px-4">
-          <div className="font-display text-3xl font-bold text-[#38BDF8] tabular-nums">
+        <div className="p-4">
+          <div className="font-code text-[11px] font-bold text-[#7E91B8]">正確率</div>
+          <div className="mt-1 font-display text-3xl font-extrabold text-[#7AA4FF] tabular-nums">
             {data.kpis.accuracy !== null ? `${data.kpis.accuracy}%` : "—"}
           </div>
-          <div className="mt-1 text-xs font-bold text-[#A8B6CC]">班級平均正確率</div>
         </div>
-        <div className="lg:pl-4">
-          <div className="font-display text-3xl font-bold text-[#FFB800] tabular-nums">
-            {data.kpis.activeAssignments} 份
+        <div className="p-4">
+          <div className="font-code text-[11px] font-bold text-[#7E91B8]">作業</div>
+          <div className="mt-1 font-display text-3xl font-extrabold text-[#FFD452] tabular-nums">
+            {data.kpis.activeAssignments}
           </div>
-          <div className="mt-1 text-xs font-bold text-[#A8B6CC]">進行中指派作業</div>
         </div>
       </section>
 
       {/* 5x6 Topic x Cognitive Type Accuracy Matrix */}
-      <section className="synth-panel-hard p-5 space-y-3">
-        <div>
-          <h2 className="text-lg font-black text-[#11151C]">
-            班級弱點熱度矩陣（五大主題 × 六大考法）
+      <section className="rail-frame p-4 sm:p-5 space-y-3">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="font-display text-base font-extrabold tracking-wide text-white">
+            弱點熱度矩陣（路線 × 題型）
           </h2>
-          <p className="text-xs text-[#4B5565]">
-            綠底 ≥ 80% · 黃底 55%–79% · 紅底 &lt; 55%（快速定位全班失分組合）
-          </p>
+          <div className="font-code text-[11px] text-[#7E91B8]">
+            ≥80% 綠 · 55–79% 黃 · &lt;55% 紅
+          </div>
         </div>
 
-        <div className="overflow-x-auto rounded-xl border border-[#C4CBD6]">
+        <div className="overflow-x-auto rounded border border-white/15">
           <table className="w-full min-w-[680px] border-collapse text-xs">
             <thead>
-              <tr className="bg-[#161A22] text-white">
-                <th className="border-r border-[#262F3F] px-3 py-2.5 text-left font-bold">
-                  知識主題
+              <tr className="bg-[#070C22] text-[#B8C5E0]">
+                <th className="border-r border-white/15 px-3 py-2 text-left font-bold">
+                  路線
                 </th>
                 {ALL_TYPES.map((qt) => (
                   <th
                     key={qt}
-                    className="border-r border-[#262F3F] last:border-r-0 px-2 py-2.5 text-center font-bold"
+                    className="border-r border-white/15 last:border-r-0 px-2 py-2 text-center font-bold"
                   >
                     {QUESTION_TYPE_LABELS[qt]}
                   </th>
@@ -149,8 +144,8 @@ export function TeacherAnalyticsClient({
             </thead>
             <tbody>
               {data.matrix.map((row) => (
-                <tr key={row.topicId} className="border-t border-[#C4CBD6]">
-                  <td className="border-r border-[#C4CBD6] bg-[#F8F9FB] px-3 py-2.5 font-bold text-[#11151C]">
+                <tr key={row.topicId} className="border-t border-white/15">
+                  <td className="border-r border-white/15 bg-[#070C22]/70 px-3 py-2 font-bold text-white">
                     {row.topicTitle}
                   </td>
                   {ALL_TYPES.map((qt) => {
@@ -158,10 +153,10 @@ export function TeacherAnalyticsClient({
                     return (
                       <td
                         key={qt}
-                        className="border-r border-[#C4CBD6] last:border-r-0 p-1.5 text-center"
+                        className="border-r border-white/15 last:border-r-0 p-1.5 text-center"
                       >
                         <div
-                          className={`rounded-lg border px-2 py-1.5 font-code tabular-nums ${getCellBadgeStyle(
+                          className={`rounded border px-2 py-1.5 font-code tabular-nums ${getCellBadgeStyle(
                             cell.accuracy
                           )}`}
                         >
@@ -169,7 +164,7 @@ export function TeacherAnalyticsClient({
                             {cell.accuracy !== null ? `${cell.accuracy}%` : "—"}
                           </div>
                           <div className="text-[10px] opacity-85">
-                            {cell.attempts > 0 ? `${cell.correct}/${cell.attempts}` : "無紀錄"}
+                            {cell.attempts > 0 ? `${cell.correct}/${cell.attempts}` : "—"}
                           </div>
                         </div>
                       </td>
@@ -184,52 +179,42 @@ export function TeacherAnalyticsClient({
 
       {/* Weakest Questions + Student Overview */}
       <div className="grid gap-6 lg:grid-cols-12">
-        <section className="lg:col-span-6 synth-panel-hard p-5 space-y-3">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4 text-[#C62828]" strokeWidth={2} />
-              <h2 className="text-base font-black text-[#11151C]">
-                最高錯誤率題目與常見迷思
-              </h2>
-            </div>
+        <section className="lg:col-span-6 rail-frame p-4 sm:p-5 space-y-3">
+          <div className="flex items-center justify-between gap-2 border-b border-white/15 pb-2.5">
+            <h2 className="inline-flex items-center gap-1.5 font-display text-base font-extrabold text-white">
+              <AlertTriangle className="h-4 w-4 text-[#FF7A85]" strokeWidth={2} />
+              <span>高錯誤率題目</span>
+            </h2>
             <Link
               href="/teacher/assignments"
-              className="text-xs font-bold text-[#007A5B] hover:underline"
+              className="font-code text-xs font-bold text-[#4ADE80] hover:underline"
             >
-              指派補強作業 →
+              指派補強 →
             </Link>
           </div>
 
           {data.weakestQuestions.length === 0 ? (
-            <p className="synth-recess p-4 text-xs text-[#4B5565]">
-              所選班級目前尚無錯誤作答紀錄。
-            </p>
+            <div className="rail-well p-4 text-xs text-[#7E91B8]">無錯誤紀錄</div>
           ) : (
-            <div className="space-y-2.5">
+            <div className="divide-y divide-white/10">
               {data.weakestQuestions.map((wq) => (
-                <div
-                  key={wq.questionId}
-                  className="rounded-xl border border-[#C4CBD6] bg-[#F8F9FB] p-3.5 text-xs space-y-1.5"
-                >
+                <div key={wq.questionId} className="py-2.5 text-xs space-y-1">
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2 min-w-0">
                       {wq.officialRef && (
-                        <span className="shrink-0 rounded bg-[#161A22] px-1.5 py-0.5 font-code font-bold text-white">
+                        <span className="shrink-0 rounded bg-white px-1.5 py-0.5 font-code font-bold text-[#0B1230]">
                           {wq.officialRef}
                         </span>
                       )}
-                      <span className="truncate font-bold text-[#11151C]">{wq.title}</span>
+                      <span className="truncate font-bold text-white">{wq.title}</span>
                     </div>
-                    <span className="shrink-0 font-code font-bold text-[#C62828] tabular-nums">
+                    <span className="shrink-0 font-code font-bold text-[#FF7A85] tabular-nums">
                       錯 {wq.errorRate}% ({wq.wrongCount}/{wq.attempts})
                     </span>
                   </div>
                   {wq.topWrongOption && (
-                    <p className="text-[#4B5565] leading-relaxed">
-                      <span className="font-bold text-[#11151C]">
-                        最常見誤選 ({wq.topWrongOption})：
-                      </span>
-                      {wq.topMisconception}
+                    <p className="text-[#B8C5E0]">
+                      誤選 ({wq.topWrongOption})：{wq.topMisconception}
                     </p>
                   )}
                 </div>
@@ -238,50 +223,50 @@ export function TeacherAnalyticsClient({
           )}
         </section>
 
-        <section className="lg:col-span-6 synth-panel-hard p-5 space-y-3">
-          <div className="flex items-center justify-between gap-2">
-            <h2 className="text-base font-black text-[#11151C]">學生學習進度一覽</h2>
+        <section className="lg:col-span-6 rail-frame p-4 sm:p-5 space-y-3">
+          <div className="flex items-center justify-between gap-2 border-b border-white/15 pb-2.5">
+            <h2 className="font-display text-base font-extrabold text-white">
+              學生進度表
+            </h2>
             <Link
-              href="/teacher/classes"
-              className="text-xs font-bold text-[#007A5B] hover:underline"
+              href="/teacher/students"
+              className="font-code text-xs font-bold text-[#4ADE80] hover:underline"
             >
-              管理班級名單 →
+              管理帳號 →
             </Link>
           </div>
 
           {data.studentOverview.length === 0 ? (
-            <p className="synth-recess p-4 text-xs text-[#4B5565]">
-              尚未有學生加入所選班級，請至「班級與學生名冊」複製加入代碼給學生。
-            </p>
+            <div className="rail-well p-4 text-xs text-[#7E91B8]">班級尚無學生</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full border-collapse text-xs">
                 <thead>
-                  <tr className="border-b border-[#C4CBD6] text-[#4B5565]">
+                  <tr className="border-b border-white/15 text-[#7E91B8]">
                     <th className="py-2 text-left font-bold">姓名</th>
                     <th className="py-2 text-left font-bold">班級</th>
-                    <th className="py-2 text-right font-bold">通過題數</th>
-                    <th className="py-2 text-right font-bold">作答次數</th>
+                    <th className="py-2 text-right font-bold">破關</th>
+                    <th className="py-2 text-right font-bold">作答</th>
                     <th className="py-2 text-right font-bold">正確率</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-[#D4DAE4]">
+                <tbody className="divide-y divide-white/10">
                   {data.studentOverview.map((s) => (
                     <tr key={`${s.studentId}-${s.className}`}>
-                      <td className="py-2.5 font-bold text-[#11151C]">
-                        {s.displayName}
-                        <span className="ml-1 font-code text-[11px] font-normal text-[#647082]">
-                          ({s.username})
+                      <td className="py-2 font-bold text-white">
+                        {s.displayName}{" "}
+                        <span className="font-code text-[11px] font-normal text-[#7E91B8]">
+                          {s.username}
                         </span>
                       </td>
-                      <td className="py-2.5 text-[#4B5565]">{s.className}</td>
-                      <td className="py-2.5 text-right font-code tabular-nums">
+                      <td className="py-2 text-[#B8C5E0]">{s.className}</td>
+                      <td className="py-2 text-right font-code text-white tabular-nums">
                         {s.solvedDistinct}
                       </td>
-                      <td className="py-2.5 text-right font-code tabular-nums">
+                      <td className="py-2 text-right font-code text-[#B8C5E0] tabular-nums">
                         {s.attempts}
                       </td>
-                      <td className="py-2.5 text-right font-code font-bold text-[#007A5B] tabular-nums">
+                      <td className="py-2 text-right font-code font-bold text-[#4ADE80] tabular-nums">
                         {s.accuracy !== null ? `${s.accuracy}%` : "—"}
                       </td>
                     </tr>

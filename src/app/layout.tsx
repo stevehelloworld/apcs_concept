@@ -4,9 +4,9 @@ import { TopNav } from "@/components/TopNav";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "OP-APCS 識讀實驗室 — Python 程式追蹤合成台與班級後台",
+  title: "APCS RAIL — Python 程式識讀路網",
   description:
-    "以 2025 APCS「程式識讀 Python 題本範例（0915）」為基準，結合模組化互動視覺實驗室、即時單步追蹤器與班級管理後台。",
+    "2025 APCS Python 0915 30 題互動路網、單步執行追蹤與教師班級後台。",
 };
 
 export default async function RootLayout({
@@ -24,12 +24,14 @@ export default async function RootLayout({
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+TC:wght@400;500;700;900&display=swap"
         />
       </head>
-      <body className="min-h-screen flex flex-col synth-chassis text-[#11151C]">
-        <TopNav initialUser={user} />
-        <main className="flex-1">{children}</main>
+      <body className="min-h-screen rail-ground text-white antialiased">
+        <div className="min-h-screen lg:flex">
+          <TopNav initialUser={user} />
+          <main className="flex-1 min-w-0 pb-20 lg:pb-0">{children}</main>
+        </div>
       </body>
     </html>
   );

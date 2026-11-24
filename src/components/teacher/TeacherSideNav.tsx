@@ -13,64 +13,64 @@ import {
 } from "lucide-react";
 
 const TEACHER_NAV = [
-  { href: "/teacher", label: "班級數據總覽", icon: BarChart3, exact: true },
-  { href: "/teacher/classes", label: "班級與學生名冊", icon: Users, exact: false },
-  { href: "/teacher/students", label: "學生帳號與進度", icon: UserCog, exact: false },
-  { href: "/teacher/questions", label: "題庫與迷思管理", icon: Database, exact: false },
-  { href: "/teacher/topics", label: "五大主題講義 CMS", icon: BookOpenCheck, exact: false },
-  { href: "/teacher/assignments", label: "作業指派與追蹤", icon: ClipboardList, exact: false },
+  { href: "/teacher", label: "總覽", icon: BarChart3, exact: true },
+  { href: "/teacher/classes", label: "班級", icon: Users, exact: false },
+  { href: "/teacher/students", label: "學生", icon: UserCog, exact: false },
+  { href: "/teacher/questions", label: "題庫", icon: Database, exact: false },
+  { href: "/teacher/topics", label: "講義", icon: BookOpenCheck, exact: false },
+  { href: "/teacher/assignments", label: "作業", icon: ClipboardList, exact: false },
 ];
 
 export function TeacherSideNav({ teacherName }: { teacherName: string }) {
   const pathname = usePathname();
 
   return (
-    <aside className="lg:w-64 shrink-0">
-      <div className="sticky top-20 synth-panel-hard overflow-hidden">
-        <div className="h-2 w-full bg-[#007A5B]" />
-        <div className="p-4 space-y-4">
-          <div className="border-b border-[#D4DAE4] pb-3">
-            <div className="inline-flex items-center gap-1.5 font-display text-[11px] font-bold text-[#007A5B]">
-              <span className="h-2 w-2 rounded-full bg-[#00C48C]" />
-              <span>MASTER CONSOLE</span>
-            </div>
-            <div className="mt-1 text-sm font-black text-[#11151C]">{teacherName}</div>
-          </div>
-
-          <nav className="space-y-1.5" aria-label="教師後台側邊導覽">
-            {TEACHER_NAV.map((item) => {
-              const Icon = item.icon;
-              const active = item.exact
-                ? pathname === item.href
-                : pathname.startsWith(item.href);
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  className={`flex items-center gap-2.5 rounded-xl border px-3 py-2 text-xs font-bold ui-transition ${
-                    active
-                      ? "border-[#161A22] bg-[#007A5B] text-white shadow-xs"
-                      : "border-[#C4CBD6] bg-white text-[#11151C] hover:border-[#161A22]"
-                  }`}
-                >
-                  <Icon className="h-4 w-4 shrink-0" strokeWidth={2} />
-                  <span>{item.label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-
-          <div className="border-t border-[#D4DAE4] pt-3">
+    <div className="mb-6 border-b border-white/20 flex flex-wrap items-center justify-between gap-3">
+      <nav
+        className="flex items-center gap-1 overflow-x-auto"
+        aria-label="教師控制台分頁"
+      >
+        {TEACHER_NAV.map((item) => {
+          const Icon = item.icon;
+          const active = item.exact
+            ? pathname === item.href
+            : pathname.startsWith(item.href);
+          return (
             <Link
-              href="/topics"
-              className="synth-pad flex items-center justify-between px-3 py-2 text-xs font-bold"
+              key={item.href}
+              href={item.href}
+              className={`relative inline-flex items-center gap-1.5 whitespace-nowrap px-3.5 py-2.5 text-xs font-bold ui-transition ${
+                active ? "text-white" : "text-[#B8C5E0] hover:text-white"
+              }`}
             >
-              <span>切換預覽學生端</span>
-              <ExternalLink className="h-3.5 w-3.5 text-[#4B5565]" strokeWidth={2} />
+              <Icon
+                className={`h-3.5 w-3.5 shrink-0 ${active ? "text-[#4ADE80]" : ""}`}
+                strokeWidth={2}
+              />
+              <span>{item.label}</span>
+              <span
+                className={`absolute inset-x-2 bottom-0 h-[2px] ${
+                  active ? "bg-[#22B14C]" : "bg-transparent"
+                }`}
+              />
             </Link>
-          </div>
-        </div>
+          );
+        })}
+      </nav>
+
+      <div className="flex items-center gap-3 pb-2 sm:pb-0 text-xs">
+        <span className="inline-flex items-center gap-1.5 font-bold text-[#B8C5E0]">
+          <span className="h-2 w-2 rounded-full bg-[#22B14C]" />
+          <span>{teacherName}</span>
+        </span>
+        <Link
+          href="/topics"
+          className="rail-btn inline-flex items-center gap-1 px-2.5 py-1 text-[11px] font-bold"
+        >
+          <span>學生端</span>
+          <ExternalLink className="h-3 w-3" strokeWidth={2} />
+        </Link>
       </div>
-    </aside>
+    </div>
   );
 }

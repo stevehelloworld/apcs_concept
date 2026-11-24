@@ -21,7 +21,7 @@ export default async function TeacherStudentsPage({
   const listRes = await listTeacherManagedStudents(user.id, null);
   if (!listRes.ok) {
     return (
-      <div className="synth-panel-hard p-6 text-sm font-bold text-[#C62828]">
+      <div className="rail-frame p-6 text-sm font-bold text-[#FF7A85]">
         {listRes.error}
       </div>
     );

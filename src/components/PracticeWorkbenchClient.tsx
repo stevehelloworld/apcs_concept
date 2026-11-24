@@ -5,7 +5,6 @@ import { useEffect, useState } from "react";
 import {
   CheckCircle2,
   ClipboardCheck,
-  Filter,
   RotateCcw,
   Sparkles,
   XCircle,
@@ -132,31 +131,31 @@ export function PracticeWorkbenchClient({
   const mockCorrectCount = Object.values(sessionResults).filter((r) => r.isCorrect).length;
 
   return (
-    <div className="space-y-6">
-      {/* Top Workbench Header */}
-      <section className="synth-panel-hard p-5 sm:p-6 flex flex-wrap items-center justify-between gap-4">
-        <div className="space-y-1">
-          <h1 className="text-2xl font-black text-[#11151C] sm:text-3xl">
+    <div className="space-y-5">
+      {/* Compact Header */}
+      <header className="flex flex-wrap items-center justify-between gap-3 border-b border-white/20 pb-3.5">
+        <div className="flex items-center gap-3">
+          <h1 className="font-display text-3xl font-extrabold tracking-wide text-white">
             {assignmentId
-              ? `班級作業任務 #${assignmentId}`
+              ? `作業 #${assignmentId}`
               : mockMode
-              ? "10 題隨機模擬挑戰"
-              : "APCS 實戰刷題實驗台"}
+              ? "10 題模擬考"
+              : "實戰刷題"}
           </h1>
-          <p className="text-sm text-[#4B5565]">
-            篩選主題、考法或個人作答狀態；每次送出即時呈現迷思盲點與單步執行重播
-          </p>
+          <span className="font-code text-xs text-[#7E91B8] tabular-nums">
+            {questions.length} 站
+          </span>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5">
+        <div className="flex items-center gap-2">
           {!mockMode ? (
             <button
               type="button"
               onClick={handleStartMockExam}
-              className="synth-pad-orange inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold"
+              className="rail-btn-primary inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold"
             >
               <Sparkles className="h-3.5 w-3.5" strokeWidth={2.2} />
-              <span>開啟 10 題隨機模擬考</span>
+              <span>10 題模擬</span>
             </button>
           ) : (
             <button
@@ -165,170 +164,148 @@ export function PracticeWorkbenchClient({
                 setMockMode(false);
                 applyFilters("all", "all", "all", "all", null);
               }}
-              className="synth-pad inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold"
+              className="rail-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold"
             >
               <RotateCcw className="h-3.5 w-3.5" strokeWidth={2} />
-              <span>結束模擬、回到完整題庫</span>
+              <span>結束模擬</span>
             </button>
           )}
         </div>
-      </section>
+      </header>
 
-      {/* Hardware Filter Strip */}
+      {/* Inline Filter Strip */}
       {!mockMode && (
-        <div className="synth-panel p-4">
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-            <label className="text-xs">
-              <span className="mb-1.5 flex items-center gap-1 font-bold text-[#4B5565]">
-                <Filter className="h-3.5 w-3.5" strokeWidth={2} /> 主題模組
-              </span>
-              <select
-                value={topicFilter}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  setTopicFilter(v);
-                  setAssignmentId(null);
-                  applyFilters(v, typeFilter, diffFilter, statusFilter, null);
-                }}
-                className="w-full rounded-lg border-[1.5px] border-[#C4CBD6] bg-white px-2.5 py-2 text-sm font-medium text-[#11151C]"
-              >
-                <option value="all">全部五大模組</option>
-                {topics.map((t) => (
-                  <option key={t.id} value={t.slug}>
-                    {t.title}
-                  </option>
-                ))}
-              </select>
-            </label>
+        <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
+          <select
+            aria-label="篩選路線"
+            value={topicFilter}
+            onChange={(e) => {
+              const v = e.target.value;
+              setTopicFilter(v);
+              setAssignmentId(null);
+              applyFilters(v, typeFilter, diffFilter, statusFilter, null);
+            }}
+            className="rail-input px-3 py-2 text-xs font-bold"
+          >
+            <option value="all">全部路線</option>
+            {topics.map((t) => (
+              <option key={t.id} value={t.slug}>
+                {t.title}
+              </option>
+            ))}
+          </select>
 
-            <label className="text-xs">
-              <span className="mb-1.5 block font-bold text-[#4B5565]">考法題型</span>
-              <select
-                value={typeFilter}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  setTypeFilter(v);
-                  setAssignmentId(null);
-                  applyFilters(topicFilter, v, diffFilter, statusFilter, null);
-                }}
-                className="w-full rounded-lg border-[1.5px] border-[#C4CBD6] bg-white px-2.5 py-2 text-sm font-medium text-[#11151C]"
-              >
-                <option value="all">全部六大考法</option>
-                {(Object.keys(QUESTION_TYPE_LABELS) as QuestionType[]).map((qt) => (
-                  <option key={qt} value={qt}>
-                    {QUESTION_TYPE_LABELS[qt]}
-                  </option>
-                ))}
-              </select>
-            </label>
+          <select
+            aria-label="篩選題型"
+            value={typeFilter}
+            onChange={(e) => {
+              const v = e.target.value;
+              setTypeFilter(v);
+              setAssignmentId(null);
+              applyFilters(topicFilter, v, diffFilter, statusFilter, null);
+            }}
+            className="rail-input px-3 py-2 text-xs font-bold"
+          >
+            <option value="all">全部題型</option>
+            {(Object.keys(QUESTION_TYPE_LABELS) as QuestionType[]).map((qt) => (
+              <option key={qt} value={qt}>
+                {QUESTION_TYPE_LABELS[qt]}
+              </option>
+            ))}
+          </select>
 
-            <label className="text-xs">
-              <span className="mb-1.5 block font-bold text-[#4B5565]">題目難度</span>
-              <select
-                value={diffFilter}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  setDiffFilter(v);
-                  setAssignmentId(null);
-                  applyFilters(topicFilter, typeFilter, v, statusFilter, null);
-                }}
-                className="w-full rounded-lg border-[1.5px] border-[#C4CBD6] bg-white px-2.5 py-2 text-sm font-medium text-[#11151C]"
-              >
-                <option value="all">全部難度</option>
-                {(Object.keys(DIFFICULTY_LABELS) as Difficulty[]).map((d) => (
-                  <option key={d} value={d}>
-                    {DIFFICULTY_LABELS[d]}
-                  </option>
-                ))}
-              </select>
-            </label>
+          <select
+            aria-label="篩選難度"
+            value={diffFilter}
+            onChange={(e) => {
+              const v = e.target.value;
+              setDiffFilter(v);
+              setAssignmentId(null);
+              applyFilters(topicFilter, typeFilter, v, statusFilter, null);
+            }}
+            className="rail-input px-3 py-2 text-xs font-bold"
+          >
+            <option value="all">全部難度</option>
+            {(Object.keys(DIFFICULTY_LABELS) as Difficulty[]).map((d) => (
+              <option key={d} value={d}>
+                {DIFFICULTY_LABELS[d]}
+              </option>
+            ))}
+          </select>
 
-            <label className="text-xs">
-              <span className="mb-1.5 block font-bold text-[#4B5565]">破關狀態</span>
-              <select
-                value={statusFilter}
-                disabled={!isLoggedIn}
-                onChange={(e) => {
-                  const v = e.target.value;
-                  setStatusFilter(v);
-                  setAssignmentId(null);
-                  applyFilters(topicFilter, typeFilter, diffFilter, v, null);
-                }}
-                className="w-full rounded-lg border-[1.5px] border-[#C4CBD6] bg-white px-2.5 py-2 text-sm font-medium text-[#11151C] disabled:opacity-50"
-              >
-                <option value="all">全部題目</option>
-                <option value="unsolved">尚未挑戰</option>
-                <option value="wrong">答錯待訂正</option>
-                <option value="solved">已破關</option>
-              </select>
-            </label>
+          <select
+            aria-label="篩選破關狀態"
+            value={statusFilter}
+            disabled={!isLoggedIn}
+            onChange={(e) => {
+              const v = e.target.value;
+              setStatusFilter(v);
+              setAssignmentId(null);
+              applyFilters(topicFilter, typeFilter, diffFilter, v, null);
+            }}
+            className="rail-input px-3 py-2 text-xs font-bold disabled:opacity-45"
+          >
+            <option value="all">全部狀態</option>
+            <option value="unsolved">未挑戰</option>
+            <option value="wrong">待訂正</option>
+            <option value="solved">已過關</option>
+          </select>
 
-            <div className="flex items-end">
-              <button
-                type="button"
-                onClick={() => {
-                  setTopicFilter("all");
-                  setTypeFilter("all");
-                  setDiffFilter("all");
-                  setStatusFilter("all");
-                  setAssignmentId(null);
-                  applyFilters("all", "all", "all", "all", null);
-                }}
-                className="synth-pad w-full py-2 text-xs font-bold"
-              >
-                重設所有篩選
-              </button>
-            </div>
-          </div>
+          <button
+            type="button"
+            onClick={() => {
+              setTopicFilter("all");
+              setTypeFilter("all");
+              setDiffFilter("all");
+              setStatusFilter("all");
+              setAssignmentId(null);
+              applyFilters("all", "all", "all", "all", null);
+            }}
+            className="rail-btn py-2 text-xs font-bold"
+          >
+            重設
+          </button>
         </div>
       )}
 
-      {/* Mock Exam OLED Summary Banner */}
+      {/* Mock Mode Telemetry */}
       {mockMode && (
-        <div className="synth-oled p-4 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5 text-sm font-bold text-white">
-            <ClipboardCheck className="h-5 w-5 text-[#FF8A65]" strokeWidth={2} />
-            <span className="tabular-nums">
-              模擬考進度：已作答 {mockAnsweredCount} / {questions.length} 題 · 答對{" "}
-              <span className="text-[#00E5A0]">{mockCorrectCount}</span> 題（正確率{" "}
+        <div className="rail-frame p-3.5 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2 text-xs font-bold text-white tabular-nums">
+            <ClipboardCheck className="h-4 w-4 text-[#FFC20E]" strokeWidth={2} />
+            <span>
+              已作答 {mockAnsweredCount}/{questions.length} · 答對{" "}
+              <span className="text-[#4ADE80]">{mockCorrectCount}</span> (
               {mockAnsweredCount > 0
                 ? Math.round((mockCorrectCount / mockAnsweredCount) * 100)
                 : 0}
-              %）
+              %)
             </span>
           </div>
           {isLoggedIn && (
             <Link
               href="/dashboard"
-              className="text-xs font-bold text-[#38BDF8] hover:underline"
+              className="font-code text-xs font-bold text-[#7AA4FF] hover:underline"
             >
-              前往我的進度儀表板 →
+              個人進度 →
             </Link>
           )}
         </div>
       )}
 
-      {/* Split Sequencer Tracklist + Active Deck */}
+      {/* Split Station List + Active Question Panel */}
       {loading ? (
-        <div className="synth-panel p-10 text-center text-sm font-bold text-[#4B5565]">
-          載入題目序列中...
+        <div className="rail-frame p-8 text-center text-xs font-bold text-[#B8C5E0]">
+          載入中...
         </div>
       ) : questions.length === 0 ? (
-        <div className="synth-panel p-10 text-center space-y-2">
-          <p className="text-base font-bold text-[#11151C]">
-            目前篩選條件下沒有符合的題目。
-          </p>
-          <p className="text-xs text-[#4B5565]">
-            請點擊「重設所有篩選」或切換其他主題模組。
-          </p>
+        <div className="rail-frame p-8 text-center text-xs font-bold text-[#B8C5E0]">
+          無符合條件的題目
         </div>
       ) : (
-        <div className="grid gap-6 lg:grid-cols-12">
-          {/* Left Sequencer Tracklist */}
-          <aside className="lg:col-span-4 space-y-2 max-h-[780px] overflow-y-auto pr-1">
-            <div className="mb-1.5 flex items-center justify-between px-1 font-code text-xs font-bold text-[#4B5565] tabular-nums">
-              <span>TRACKLIST // 共 {questions.length} 題</span>
-            </div>
+        <div className="grid gap-5 lg:grid-cols-12">
+          {/* Left Station Timetable */}
+          <aside className="lg:col-span-4 rail-frame divide-y divide-white/10 max-h-[760px] overflow-y-auto">
             {questions.map((q, idx) => {
               const isActive = activeQuestion?.id === q.id;
               const last = q.user_last_attempt;
@@ -339,46 +316,41 @@ export function PracticeWorkbenchClient({
                   key={q.id}
                   type="button"
                   onClick={() => setSelectedId(q.id)}
-                  className={`flex w-full items-start justify-between gap-2.5 rounded-xl border-[1.5px] p-3 text-left ui-transition ${
+                  className={`flex w-full items-center justify-between gap-2.5 px-3 py-2.5 text-left ui-transition ${
                     isActive
-                      ? "border-[#161A22] bg-[#FFF1EC] ring-2 ring-[#FF4F17]/30 shadow-xs"
-                      : "border-[#C4CBD6] bg-white hover:border-[#161A22]"
+                      ? "bg-[#1E5BFF]/20 text-white"
+                      : "hover:bg-white/[0.04] text-[#B8C5E0]"
                   }`}
                 >
-                  <div className="space-y-1.5 min-w-0">
-                    <div className="flex flex-wrap items-center gap-1.5 text-xs">
-                      <span
-                        className={`h-2 w-2 rounded-full ${
-                          isActive ? "bg-[#FF4F17]" : ""
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <span
+                      className="h-2.5 w-2.5 rounded-full shrink-0"
+                      style={{ backgroundColor: theme.hex }}
+                    />
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5 font-code text-[11px] text-[#7E91B8] tabular-nums">
+                        <span>{String(idx + 1).padStart(2, "0")}</span>
+                        {q.official_ref && (
+                          <span className="font-bold text-white">{q.official_ref}</span>
+                        )}
+                        <span>· {QUESTION_TYPE_LABELS[q.question_type]}</span>
+                      </div>
+                      <div
+                        className={`truncate text-xs font-bold ${
+                          isActive ? "text-white" : "text-[#B8C5E0]"
                         }`}
-                        style={!isActive ? { backgroundColor: theme.hex } : undefined}
-                      />
-                      <span className="font-code text-[#647082] tabular-nums">
-                        {String(idx + 1).padStart(2, "0")}.
-                      </span>
-                      {q.official_ref && (
-                        <span className="rounded bg-[#161A22] px-1.5 py-0.5 font-code text-[11px] font-bold text-white">
-                          {q.official_ref}
-                        </span>
-                      )}
-                      <span className="text-[11px] font-bold text-[#4B5565]">
-                        {QUESTION_TYPE_LABELS[q.question_type]}
-                      </span>
-                    </div>
-                    <div className="truncate text-sm font-bold text-[#11151C]">
-                      {q.title}
-                    </div>
-                    <div className="text-[11px] font-medium text-[#647082]">
-                      {q.topic_title}
+                      >
+                        {q.title}
+                      </div>
                     </div>
                   </div>
 
                   {last && (
-                    <span className="shrink-0 mt-1">
+                    <span className="shrink-0">
                       {last.is_correct ? (
-                        <CheckCircle2 className="h-4 w-4 text-[#007A57]" strokeWidth={2.2} />
+                        <CheckCircle2 className="h-4 w-4 text-[#4ADE80]" strokeWidth={2.2} />
                       ) : (
-                        <XCircle className="h-4 w-4 text-[#C62828]" strokeWidth={2.2} />
+                        <XCircle className="h-4 w-4 text-[#FF7A85]" strokeWidth={2.2} />
                       )}
                     </span>
                   )}
@@ -387,7 +359,6 @@ export function PracticeWorkbenchClient({
             })}
           </aside>
 
-          {/* Right Active Hardware Card */}
           <div className="lg:col-span-8 min-w-0">
             {activeQuestion && (
               <PracticeQuestionCard

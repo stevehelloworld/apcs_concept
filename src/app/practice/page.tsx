@@ -14,6 +14,7 @@ export default async function PracticePage({
     status?: string;
     assignmentId?: string;
     qid?: string;
+    q?: string;
   }>;
 }) {
   const sp = await searchParams;
@@ -25,7 +26,8 @@ export default async function PracticePage({
   const initialDifficulty = sp.difficulty ?? "all";
   const initialStatus = sp.status ?? "all";
   const initialAssignmentId = sp.assignmentId ? Number(sp.assignmentId) : null;
-  const initialQuestionId = sp.qid ? Number(sp.qid) : null;
+  const rawQid = sp.qid ?? sp.q;
+  const initialQuestionId = rawQid ? Number(rawQid) : null;
 
   const initialQuestions = await queryVisibleQuestions(user, {
     topicSlug: initialTopic,
@@ -36,7 +38,7 @@ export default async function PracticePage({
   });
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6">
+    <div className="mx-auto max-w-[1320px] px-4 py-6 sm:px-6 lg:py-8">
       <PracticeWorkbenchClient
         topics={topics}
         initialQuestions={initialQuestions}
