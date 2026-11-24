@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Sliders, Split, ShieldAlert } from "lucide-react";
+import { ShieldAlert, Sliders, Split } from "lucide-react";
 import { PythonCodeView } from "../PythonCodeView";
 
 type TabKey = "q17" | "q27" | "q29";
@@ -39,7 +39,11 @@ for x in A:
     if x < N:
         N = x`;
 
-function evalWrongGrade(s: number): { grade: string; hitLine: number; expected: string } {
+function evalWrongGrade(s: number): {
+  grade: string;
+  hitLine: number;
+  expected: string;
+} {
   const expected =
     s >= 90 ? "A" : s >= 80 ? "B" : s >= 70 ? "C" : s >= 60 ? "D" : "F";
   if (s >= 90) return { grade: "A", hitLine: 2, expected };
@@ -78,7 +82,6 @@ export function IntervalBranchVisualizer() {
   };
   const arr = datasets[datasetKey].arr;
 
-  // Compute buggy vs fixed trace
   let bugM = -1;
   let bugN = 101;
   const bugTrace = arr.map((x) => {
@@ -103,318 +106,338 @@ export function IntervalBranchVisualizer() {
   }
 
   return (
-    <div className="rounded-lg border border-[#E2E0D8] bg-white p-5">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-[#E2E0D8] pb-3">
-        <div>
-          <h3 className="text-base font-semibold text-[#17191C]">
-            互動視覺化實驗室：分支覆蓋與區間推理
-          </h3>
-          <p className="text-xs text-[#525866]">
-            切換三個交互實驗，直接觀察條件順序錯置、區間平移死碼與 elif 互斥的真實行為
-          </p>
+    <div className="synth-panel-hard overflow-hidden">
+      <div className="h-2 w-full bg-[#FF4F17]" />
+      <div className="p-5 sm:p-6 space-y-5">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#D4DAE4] pb-4">
+          <div>
+            <h3 className="flex items-center gap-2 text-base font-black text-[#11151C]">
+              <span className="rounded bg-[#161A22] px-2 py-0.5 font-display text-xs font-bold text-[#FF8A65]">
+                LAB-01
+              </span>
+              <span>分支覆蓋與區間示波器</span>
+            </h3>
+            <p className="mt-1 text-xs text-[#4B5565]">
+              拉動滑桿實測條件順序遮蔽、區間平移死碼與 elif 互斥陷阱
+            </p>
+          </div>
+
+          <div className="synth-recess flex flex-wrap gap-1 p-1">
+            <button
+              type="button"
+              onClick={() => setTab("q17")}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold ui-transition ${
+                tab === "q17"
+                  ? "bg-[#161A22] text-white"
+                  : "text-[#4B5565] hover:text-[#11151C]"
+              }`}
+            >
+              <Sliders className="h-3.5 w-3.5" strokeWidth={2} />
+              <span>Q17 數線遮蔽</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("q27")}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold ui-transition ${
+                tab === "q27"
+                  ? "bg-[#161A22] text-white"
+                  : "text-[#4B5565] hover:text-[#11151C]"
+              }`}
+            >
+              <ShieldAlert className="h-3.5 w-3.5" strokeWidth={2} />
+              <span>Q27 平移死碼</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setTab("q29")}
+              className={`inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-bold ui-transition ${
+                tab === "q29"
+                  ? "bg-[#161A22] text-white"
+                  : "text-[#4B5565] hover:text-[#11151C]"
+              }`}
+            >
+              <Split className="h-3.5 w-3.5" strokeWidth={2} />
+              <span>Q29 if vs elif</span>
+            </button>
+          </div>
         </div>
 
-        <div className="flex flex-wrap gap-1.5">
-          <button
-            type="button"
-            onClick={() => setTab("q17")}
-            className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium ui-transition ${
-              tab === "q17"
-                ? "bg-[#1E4E8C] text-white"
-                : "border border-[#E2E0D8] bg-[#F7F6F2] text-[#525866] hover:text-[#17191C]"
-            }`}
-          >
-            <Sliders className="h-3.5 w-3.5" strokeWidth={1.75} />
-            <span>Q17 數線區間遮蔽</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab("q27")}
-            className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium ui-transition ${
-              tab === "q27"
-                ? "bg-[#1E4E8C] text-white"
-                : "border border-[#E2E0D8] bg-[#F7F6F2] text-[#525866] hover:text-[#17191C]"
-            }`}
-          >
-            <ShieldAlert className="h-3.5 w-3.5" strokeWidth={1.75} />
-            <span>Q27 區間平移死碼</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setTab("q29")}
-            className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium ui-transition ${
-              tab === "q29"
-                ? "bg-[#1E4E8C] text-white"
-                : "border border-[#E2E0D8] bg-[#F7F6F2] text-[#525866] hover:text-[#17191C]"
-            }`}
-          >
-            <Split className="h-3.5 w-3.5" strokeWidth={1.75} />
-            <span>Q29 if vs elif 對照</span>
-          </button>
-        </div>
-      </div>
+        {tab === "q17" && (
+          <div className="grid gap-5 lg:grid-cols-12">
+            <div className="lg:col-span-6 space-y-4">
+              <div className="synth-recess p-4 space-y-3">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <label htmlFor="score-slider" className="text-sm font-bold text-[#11151C]">
+                    推桿測試分數{" "}
+                    <span className="rounded bg-[#161A22] px-2 py-0.5 font-code text-xs text-[#FF8A65]">
+                      s = {score}
+                    </span>
+                  </label>
+                  <div className="flex flex-wrap gap-1">
+                    {[59, 60, 65, 70, 75, 85, 95].map((preset) => (
+                      <button
+                        key={preset}
+                        type="button"
+                        onClick={() => setScore(preset)}
+                        className={`rounded-md border px-2 py-0.5 font-code text-xs font-bold tabular-nums ui-transition ${
+                          score === preset
+                            ? "border-[#161A22] bg-[#D93B09] text-white"
+                            : "border-[#C4CBD6] bg-white text-[#11151C] hover:border-[#161A22]"
+                        }`}
+                      >
+                        {preset}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <input
+                  id="score-slider"
+                  type="range"
+                  min={0}
+                  max={100}
+                  value={score}
+                  onChange={(e) => setScore(Number(e.target.value))}
+                  className="synth-slider w-full"
+                />
+              </div>
 
-      {tab === "q17" && (
-        <div className="grid gap-5 lg:grid-cols-12">
-          <div className="lg:col-span-6 space-y-4">
-            <div className="rounded-md border border-[#E2E0D8] bg-[#F7F6F2] p-4">
-              <div className="mb-2 flex items-center justify-between">
-                <label htmlFor="score-slider" className="text-sm font-semibold text-[#17191C]">
-                  拖動測試分數 <span className="font-code text-[#1E4E8C]">s = {score}</span>
-                </label>
-                <div className="flex gap-1.5">
-                  {[59, 60, 65, 70, 75, 85, 95].map((preset) => (
-                    <button
-                      key={preset}
-                      type="button"
-                      onClick={() => setScore(preset)}
-                      className={`rounded px-2 py-0.5 font-code text-xs tabular-nums ${
-                        score === preset
-                          ? "bg-[#1E4E8C] text-white"
-                          : "border border-[#E2E0D8] bg-white text-[#525866] hover:bg-[#EAF1FA]"
+              <div className="space-y-2">
+                <div className="text-xs font-bold text-[#4B5565]">
+                  0 ~ 100 實際命中分區（紅框為判錯的 11 個分數：60 與 70~79）
+                </div>
+                <div className="grid grid-cols-3 sm:grid-cols-6 gap-1.5 font-code text-[11px] font-bold">
+                  {[
+                    {
+                      range: "0..59",
+                      out: "F 正確",
+                      active: score <= 59,
+                      cls: "bg-[#DDE2EA] text-[#11151C] border-[#B9C2D0]",
+                    },
+                    {
+                      range: "60",
+                      out: "誤F (錯)",
+                      active: score === 60,
+                      cls: "bg-[#FDECEC] text-[#C62828] border-[#F9B4B4]",
+                    },
+                    {
+                      range: "61..69",
+                      out: "D 正確",
+                      active: score >= 61 && score <= 69,
+                      cls: "bg-[#E6FAF3] text-[#007A57] border-[#9EE7D0]",
+                    },
+                    {
+                      range: "70..79",
+                      out: "誤D (錯)",
+                      active: score >= 70 && score <= 79,
+                      cls: "bg-[#FDECEC] text-[#C62828] border-[#F9B4B4]",
+                    },
+                    {
+                      range: "80..89",
+                      out: "B 正確",
+                      active: score >= 80 && score <= 89,
+                      cls: "bg-[#EDF3FF] text-[#1D4ED8] border-[#B3CEFF]",
+                    },
+                    {
+                      range: "90..100",
+                      out: "A 正確",
+                      active: score >= 90,
+                      cls: "bg-[#EDF3FF] text-[#1D4ED8] border-[#B3CEFF]",
+                    },
+                  ].map((zone) => (
+                    <div
+                      key={zone.range}
+                      className={`rounded-lg border px-2 py-2 text-center ui-transition ${zone.cls} ${
+                        zone.active ? "ring-2 ring-[#161A22]" : ""
                       }`}
                     >
-                      {preset}
-                    </button>
+                      <div className="font-bold">{zone.range}</div>
+                      <div className="mt-0.5 text-[10px] opacity-90">{zone.out}</div>
+                    </div>
+                  ))}
+                </div>
+
+                <div
+                  className={`rounded-xl border-2 p-3.5 text-sm ${
+                    isScoreWrong
+                      ? "border-[#C62828] bg-[#FDECEC] text-[#C62828]"
+                      : "border-[#007A57] bg-[#E6FAF3] text-[#007A57]"
+                  }`}
+                >
+                  <div className="font-bold">
+                    當 s = {score}：程式輸出「{scoreEval.grade}」／ 正確應為「
+                    {scoreEval.expected}」{isScoreWrong ? "（抓到判錯！）" : "（正確）"}
+                  </div>
+                  <p className="mt-1 text-xs leading-relaxed text-[#11151C]">
+                    {score === 60
+                      ? "s == 60 不滿足 s > 60（漏掉等號 >=），直接掉進 else 輸出 F。"
+                      : score >= 70 && score <= 79
+                      ? "s 在 70~79 之間時，上方第 5 行 elif s > 60 先成立，直接輸出 D 並跳過第 7 行。"
+                      : "此分數未受上方條件錯置與嚴格大於號影響。"}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-6">
+              <PythonCodeView
+                code={SCORE_CODE}
+                activeLine={scoreEval.hitLine}
+                deadLines={[7, 8]}
+                caption="第 7-8 行 elif s > 70 永遠被第 5 行遮蔽"
+                compact
+              />
+            </div>
+          </div>
+        )}
+
+        {tab === "q27" && (
+          <div className="grid gap-5 lg:grid-cols-12">
+            <div className="lg:col-span-6 space-y-4">
+              <div className="synth-recess p-4 space-y-2.5">
+                <label htmlFor="init-a-slider" className="block text-sm font-bold text-[#11151C]">
+                  測試任意初始整數（-5 .. 15）：
+                  <span className="ml-2 rounded bg-[#161A22] px-2 py-0.5 font-code text-xs text-[#FF8A65]">
+                    a = {initA}
+                  </span>
+                </label>
+                <input
+                  id="init-a-slider"
+                  type="range"
+                  min={-5}
+                  max={15}
+                  value={initA}
+                  onChange={(e) => setInitA(Number(e.target.value))}
+                  className="synth-slider w-full"
+                />
+                <p className="text-xs leading-relaxed text-[#4B5565]">
+                  注意兩個 <code className="font-code font-bold">if</code> 都在{" "}
+                  <code className="font-code font-bold">while</code> 外層！跳出迴圈必落入{" "}
+                  <code className="font-code font-bold">a &gt;= 10</code>，經{" "}
+                  <code className="font-code font-bold">+2</code> 平移後恆落入{" "}
+                  <code className="font-code font-bold">[12, ∞)</code>。
+                </p>
+              </div>
+
+              <div className="synth-oled divide-y divide-[#262F3F] text-xs">
+                <div className="flex items-center justify-between gap-2 p-3">
+                  <span className="text-[#94A3B8]">1. while a &lt; 10 歷程</span>
+                  <span className="font-code font-bold text-[#EEF2F8]">
+                    {loopSteps.length > 0
+                      ? `${initA} → ${loopSteps.join(" → ")}`
+                      : `直接跳出（${initA} >= 10）`}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-2 p-3">
+                  <span className="text-[#94A3B8]">2. 離開 while 後（保證 ≥ 10）</span>
+                  <span className="font-code font-bold text-[#38BDF8]">{afterWhile}</span>
+                </div>
+                <div className="flex items-center justify-between gap-2 p-3">
+                  <span className="text-[#94A3B8]">3. if a &lt; 12（加 2）後</span>
+                  <span className="font-code font-bold text-[#FFB800]">
+                    {afterStep2} {entersIf12 ? "（觸發 +2）" : "（未觸發，已 >= 12）"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-2 p-3">
+                  <span className="text-[#94A3B8]">4. 到達 if a &lt; 11 時</span>
+                  <span
+                    className={`font-code font-bold ${
+                      entersIf11 ? "text-[#FF6B7B]" : "text-[#00E5A0]"
+                    }`}
+                  >
+                    {entersIf11
+                      ? "True -> 執行 a = 5"
+                      : `False（${afterStep2} >= 12，永遠跳過）`}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div className="lg:col-span-6">
+              <PythonCodeView
+                code={DEADCODE_CODE}
+                deadLines={[7]}
+                caption="靜態區間推導目標：第 7 行 a = 5"
+                compact
+              />
+            </div>
+          </div>
+        )}
+
+        {tab === "q29" && (
+          <div className="space-y-4">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-xs font-bold text-[#4B5565]">切換測資 A：</span>
+              {(Object.keys(datasets) as Array<"inc" | "mix" | "dec">).map((key) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setDatasetKey(key)}
+                  className={`rounded-lg border px-3 py-1.5 text-xs font-bold ui-transition ${
+                    datasetKey === key
+                      ? "border-[#161A22] bg-[#D93B09] text-white"
+                      : "border-[#C4CBD6] bg-white text-[#11151C] hover:border-[#161A22]"
+                  }`}
+                >
+                  {datasets[key].label}
+                </button>
+              ))}
+            </div>
+
+            <div className="grid gap-4 lg:grid-cols-2">
+              <div className="rounded-xl border border-[#C4CBD6] bg-[#F8F9FB] p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[#C62828]">
+                    錯誤寫法：使用 elif（互斥跳過）
+                  </span>
+                  <span className="rounded bg-[#161A22] px-2 py-0.5 font-code text-xs font-bold text-white">
+                    M = {bugM}, N = {bugN}
+                  </span>
+                </div>
+                <PythonCodeView code={ELIF_BUG_CODE} bugLines={[5]} compact />
+                <div className="space-y-1.5">
+                  {bugTrace.map((step, idx) => (
+                    <div
+                      key={idx}
+                      className="flex items-center justify-between rounded-lg border border-[#C4CBD6] bg-white px-3 py-1.5 text-xs"
+                    >
+                      <span className="font-code font-bold text-[#11151C]">x={step.x}</span>
+                      <span className="text-[#4B5565]">{step.branch}</span>
+                      <span className="font-code font-bold tabular-nums text-[#B83006]">
+                        M={step.bugM}, N={step.bugN}
+                      </span>
+                    </div>
                   ))}
                 </div>
               </div>
-              <input
-                id="score-slider"
-                type="range"
-                min={0}
-                max={100}
-                value={score}
-                onChange={(e) => setScore(Number(e.target.value))}
-                className="w-full accent-[#1E4E8C]"
-              />
-            </div>
 
-            {/* 0~100 Coverage Map */}
-            <div className="space-y-2">
-              <div className="text-xs font-semibold text-[#525866]">
-                0 ~ 100 實際數線命中區域（紅色為錯判的 11 個分數：60 與 70~79）
-              </div>
-              <div className="flex h-10 w-full overflow-hidden rounded-md border border-[#E2E0D8] font-code text-xs font-medium">
-                <div
-                  style={{ width: "60%" }}
-                  className="flex items-center justify-center bg-[#F0EFEA] text-[#525866] border-r border-[#E2E0D8]"
-                  title="0~59 -> F (正確)"
-                >
-                  0..59 (F)
+              <div className="rounded-xl border border-[#C4CBD6] bg-[#F8F9FB] p-4 space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-[#007A57]">
+                    正確寫法：兩個獨立 if
+                  </span>
+                  <span className="rounded bg-[#007A57] px-2 py-0.5 font-code text-xs font-bold text-white">
+                    M = {fixM}, N = {fixN}
+                  </span>
                 </div>
-                <div
-                  style={{ width: "3%" }}
-                  className="flex items-center justify-center bg-[#FCEEEE] text-[#C23535] border-r border-[#E2E0D8]"
-                  title="60 -> 誤判 F (錯 1 個)"
-                >
-                  60
+                <PythonCodeView code={ELIF_FIXED_CODE} compact />
+                <div className="rounded-xl border border-[#9EE7D0] bg-[#E6FAF3] p-3.5 text-xs leading-relaxed text-[#11151C]">
+                  {bugN !== fixN ? (
+                    <>
+                      <strong className="text-[#C62828]">成功揪出 Bug！</strong>{" "}
+                      在嚴格遞增測資下每輪皆命中 <code className="font-code font-bold">x &gt; M</code>，導致{" "}
+                      <code className="font-code font-bold">elif x &lt; N</code> 一次也沒跑，N 卡死在初始值 101。
+                    </>
+                  ) : (
+                    <>
+                      這組測資有出現較小數值進入 <code className="font-code font-bold">elif</code> 更新 N，所以剛好逃過檢測，這正是測試容易漏抓的原因！
+                    </>
+                  )}
                 </div>
-                <div
-                  style={{ width: "9%" }}
-                  className="flex items-center justify-center bg-[#EAF6EF] text-[#157F4B] border-r border-[#E2E0D8]"
-                  title="61~69 -> D (正確)"
-                >
-                  61..69
-                </div>
-                <div
-                  style={{ width: "10%" }}
-                  className="flex items-center justify-center bg-[#FCEEEE] text-[#C23535] border-r border-[#E2E0D8]"
-                  title="70~79 -> 被 s>60 攔截誤判 D (錯 10 個)"
-                >
-                  70..79!
-                </div>
-                <div
-                  style={{ width: "9%" }}
-                  className="flex items-center justify-center bg-[#EAF1FA] text-[#1E4E8C] border-r border-[#E2E0D8]"
-                  title="80~89 -> B (正確)"
-                >
-                  80..89
-                </div>
-                <div
-                  style={{ width: "9%" }}
-                  className="flex items-center justify-center bg-[#EAF1FA] text-[#1E4E8C]"
-                  title="90~100 -> A (正確)"
-                >
-                  90..100
-                </div>
-              </div>
-
-              <div
-                className={`rounded-md border p-3 text-sm ${
-                  isScoreWrong
-                    ? "border-[#C23535]/40 bg-[#FCEEEE] text-[#C23535]"
-                    : "border-[#157F4B]/30 bg-[#EAF6EF] text-[#157F4B]"
-                }`}
-              >
-                <div className="font-semibold">
-                  當 s = {score}：程式輸出「{scoreEval.grade}」／ 正確應為「{scoreEval.expected}」
-                  {isScoreWrong ? "（判錯！）" : "（正確）"}
-                </div>
-                <p className="mt-1 text-xs text-[#17191C]">
-                  {score === 60
-                    ? "s == 60 不滿足 s > 60（缺少等號 >=），直接掉進 else 輸出 F。"
-                    : score >= 70 && score <= 79
-                    ? "s 在 70~79 之間時，上方第 5 行 elif s > 60 先成立，直接輸出 D 並跳過底下的 elif s > 70。"
-                    : "此分數未受到上方條件錯置與嚴格大於號的影響。"}
-                </p>
               </div>
             </div>
           </div>
-
-          <div className="lg:col-span-6">
-            <PythonCodeView
-              code={SCORE_CODE}
-              activeLine={scoreEval.hitLine}
-              deadLines={[7, 8]}
-              caption="第 7-8 行 elif s > 70 永遠被第 5 行遮蔽"
-              compact
-            />
-          </div>
-        </div>
-      )}
-
-      {tab === "q27" && (
-        <div className="grid gap-5 lg:grid-cols-12">
-          <div className="lg:col-span-6 space-y-4">
-            <div className="rounded-md border border-[#E2E0D8] bg-[#F7F6F2] p-4">
-              <div className="mb-2 flex items-center justify-between">
-                <label htmlFor="init-a-slider" className="text-sm font-semibold text-[#17191C]">
-                  測試任意初始整數（-5 .. 15）：
-                  <span className="ml-1 font-code text-[#1E4E8C]">a = {initA}</span>
-                </label>
-              </div>
-              <input
-                id="init-a-slider"
-                type="range"
-                min={-5}
-                max={15}
-                value={initA}
-                onChange={(e) => setInitA(Number(e.target.value))}
-                className="w-full accent-[#1E4E8C]"
-              />
-              <p className="mt-2 text-xs text-[#525866]">
-                注意兩個 <code className="font-code">if</code> 都在 <code className="font-code">while</code> 外層！跳出迴圈時必落入 <code className="font-code">a &gt;= 10</code>，經 <code className="font-code">+2</code> 平移後恆落入 <code className="font-code">[12, ∞)</code>。
-              </p>
-            </div>
-
-            <div className="space-y-2 rounded-md border border-[#E2E0D8] bg-white p-3.5 text-sm">
-              <div className="flex items-center justify-between border-b border-[#E2E0D8] pb-2">
-                <span className="text-[#525866]">1. while a &lt; 10 執行歷程：</span>
-                <span className="font-code font-semibold text-[#17191C]">
-                  {loopSteps.length > 0 ? `${initA} → ${loopSteps.join(" → ")}` : `直接跳出（${initA} >= 10）`}
-                </span>
-              </div>
-              <div className="flex items-center justify-between border-b border-[#E2E0D8] pb-2">
-                <span className="text-[#525866]">2. 離開 while 後（保證 ≥ 10）：</span>
-                <span className="font-code font-semibold text-[#1E4E8C]">{afterWhile}</span>
-              </div>
-              <div className="flex items-center justify-between border-b border-[#E2E0D8] pb-2">
-                <span className="text-[#525866]">3. if a &lt; 12（加 2）後：</span>
-                <span className="font-code font-semibold text-[#1E4E8C]">
-                  {afterStep2} {entersIf12 ? "（觸發 +2）" : "（未觸發，因已 >= 12）"}
-                </span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-[#525866]">4. 到達 if a &lt; 11 時：</span>
-                <span
-                  className={`font-code font-semibold ${
-                    entersIf11 ? "text-[#C23535]" : "text-[#157F4B]"
-                  }`}
-                >
-                  {entersIf11 ? "True -> 執行 a = 5" : `False（${afterStep2} >= 12 > 11，永遠跳過）`}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <div className="lg:col-span-6">
-            <PythonCodeView
-              code={DEADCODE_CODE}
-              deadLines={[7]}
-              caption="靜態區間推導目標：第 7 行 a = 5"
-              compact
-            />
-          </div>
-        </div>
-      )}
-
-      {tab === "q29" && (
-        <div className="space-y-4">
-          <div className="flex flex-wrap items-center gap-2">
-            <span className="text-xs font-semibold text-[#525866]">挑選測試列表 A：</span>
-            {(Object.keys(datasets) as Array<"inc" | "mix" | "dec">).map((key) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setDatasetKey(key)}
-                className={`rounded-md px-3 py-1.5 text-xs font-medium ui-transition ${
-                  datasetKey === key
-                    ? "bg-[#1E4E8C] text-white"
-                    : "border border-[#E2E0D8] bg-[#F7F6F2] text-[#525866] hover:text-[#17191C]"
-                }`}
-              >
-                {datasets[key].label}
-              </button>
-            ))}
-          </div>
-
-          <div className="grid gap-4 lg:grid-cols-2">
-            <div className="rounded-md border border-[#E2E0D8] bg-[#F7F6F2] p-3.5">
-              <div className="mb-2 flex items-center justify-between">
-                <span className="text-xs font-semibold text-[#C23535]">
-                  錯誤寫法：使用 elif（互斥跳過）
-                </span>
-                <span className="font-code text-xs font-semibold text-[#17191C]">
-                  輸出：M = {bugM}, N = {bugN}
-                </span>
-              </div>
-              <PythonCodeView code={ELIF_BUG_CODE} bugLines={[5]} compact />
-              <div className="mt-2.5 space-y-1">
-                {bugTrace.map((step, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-between rounded border border-[#E2E0D8] bg-white px-2.5 py-1 text-xs"
-                  >
-                    <span className="font-code text-[#17191C]">x={step.x}</span>
-                    <span className="text-[#525866]">{step.branch}</span>
-                    <span className="font-code tabular-nums text-[#1E4E8C]">
-                      M={step.bugM}, N={step.bugN}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="rounded-md border border-[#E2E0D8] bg-[#F7F6F2] p-3.5">
-              <div className="mb-2 flex items-center justify-between">
-                <span className="text-xs font-semibold text-[#157F4B]">
-                  正確寫法：兩個獨立 if
-                </span>
-                <span className="font-code text-xs font-semibold text-[#157F4B]">
-                  輸出：M = {fixM}, N = {fixN}
-                </span>
-              </div>
-              <PythonCodeView code={ELIF_FIXED_CODE} compact />
-              <div className="mt-3 rounded border border-[#157F4B]/30 bg-[#EAF6EF] p-3 text-xs leading-relaxed text-[#17191C]">
-                {bugN !== fixN ? (
-                  <>
-                    <strong className="text-[#C23535]">成功抓到 Bug！</strong> 在嚴格遞增測資下，每輪都滿足{" "}
-                    <code className="font-code">x &gt; M</code> 導致{" "}
-                    <code className="font-code">elif x &lt; N</code> 一次也沒執行，N 停留在錯誤的初始值{" "}
-                    <code className="font-code">101</code>。
-                  </>
-                ) : (
-                  <>
-                    這組測資在第一筆以後有出現比 M 小的數值，因此湊巧進到過{" "}
-                    <code className="font-code">elif</code> 更新 N，這正是它能躲過一般測試的原因！
-                  </>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   );
 }

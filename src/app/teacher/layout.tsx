@@ -19,24 +19,20 @@ export default async function TeacherLayout({
   if (user.role !== "teacher") {
     return (
       <div className="mx-auto max-w-lg px-4 py-16">
-        <div className="rounded-lg border border-[#C23535]/30 bg-white p-6 text-center space-y-4">
-          <ShieldAlert className="mx-auto h-10 w-10 text-[#C23535]" strokeWidth={1.75} />
-          <h1 className="text-xl font-bold text-[#17191C]">權限不足：僅限教師帳號</h1>
-          <p className="text-sm text-[#525866]">
-            目前登入帳號「{user.display_name}」為學生身份，無法存取教師班級與題庫管理後台。
+        <div className="synth-panel-hard p-6 sm:p-7 text-center space-y-4">
+          <ShieldAlert className="mx-auto h-10 w-10 text-[#C62828]" strokeWidth={2} />
+          <h1 className="text-xl font-black text-[#11151C]">
+            權限不足：僅限教師帳號進入
+          </h1>
+          <p className="text-sm text-[#4B5565]">
+            目前登入帳號「{user.display_name}」為學生身份，無法存取教師班級與題庫控制台。
           </p>
-          <div className="flex justify-center gap-3">
-            <Link
-              href="/dashboard"
-              className="rounded-md bg-[#1E4E8C] px-4 py-2 text-sm font-medium text-white hover:bg-[#163C6E]"
-            >
-              返回學生儀表板
+          <div className="flex flex-wrap justify-center gap-3 pt-1">
+            <Link href="/dashboard" className="synth-pad-orange px-4 py-2 text-sm font-bold">
+              返回學生學習進度
             </Link>
-            <Link
-              href="/topics"
-              className="rounded-md border border-[#E2E0D8] bg-white px-4 py-2 text-sm font-medium text-[#17191C] hover:bg-[#F0EFEA]"
-            >
-              瀏覽主題教學
+            <Link href="/topics" className="synth-pad px-4 py-2 text-sm font-bold">
+              瀏覽五大模組
             </Link>
           </div>
         </div>

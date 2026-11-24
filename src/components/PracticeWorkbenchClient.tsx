@@ -10,6 +10,7 @@ import {
   Sparkles,
   XCircle,
 } from "lucide-react";
+import { getTopicTheme } from "@/lib/topic-theme";
 import type {
   AttemptSubmitResult,
   Difficulty,
@@ -90,7 +91,6 @@ export function PracticeWorkbenchClient({
   }
 
   useEffect(() => {
-    // Keep selection valid if questions list changes
     if (questions.length > 0 && !questions.some((q) => q.id === selectedId)) {
       setSelectedId(questions[0].id);
     }
@@ -104,7 +104,6 @@ export function PracticeWorkbenchClient({
     setStatusFilter("all");
     setAssignmentId(null);
     setSessionResults({});
-    // Pick 10 balanced questions across topics
     const shuffled = [...initialQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
     setQuestions(shuffled);
     setSelectedId(shuffled[0]?.id ?? null);
@@ -134,30 +133,30 @@ export function PracticeWorkbenchClient({
 
   return (
     <div className="space-y-6">
-      {/* Top Header & Quick Mode Controls */}
-      <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#E2E0D8] pb-4">
-        <div>
-          <h1 className="text-2xl font-bold text-[#17191C]">
+      {/* Top Workbench Header */}
+      <section className="synth-panel-hard p-5 sm:p-6 flex flex-wrap items-center justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-black text-[#11151C] sm:text-3xl">
             {assignmentId
               ? `班級作業任務 #${assignmentId}`
               : mockMode
-              ? "10 題綜合模擬測驗"
-              : "APCS 程式識讀刷題工作台"}
+              ? "10 題隨機模擬挑戰"
+              : "APCS 實戰刷題實驗台"}
           </h1>
-          <p className="mt-1 text-sm text-[#525866]">
-            依五大主題、六大認知題型或待訂正狀態篩選題目；作答後立即獲得迷思診斷與單步追蹤。
+          <p className="text-sm text-[#4B5565]">
+            篩選主題、考法或個人作答狀態；每次送出即時呈現迷思盲點與單步執行重播
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           {!mockMode ? (
             <button
               type="button"
               onClick={handleStartMockExam}
-              className="inline-flex items-center gap-1.5 rounded-md bg-[#1E4E8C] px-3.5 py-2 text-xs font-medium text-white ui-transition hover:bg-[#163C6E]"
+              className="synth-pad-orange inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold"
             >
-              <Sparkles className="h-3.5 w-3.5" strokeWidth={1.75} />
-              <span>開啟 10 題綜合模擬測驗</span>
+              <Sparkles className="h-3.5 w-3.5" strokeWidth={2.2} />
+              <span>開啟 10 題隨機模擬考</span>
             </button>
           ) : (
             <button
@@ -166,22 +165,22 @@ export function PracticeWorkbenchClient({
                 setMockMode(false);
                 applyFilters("all", "all", "all", "all", null);
               }}
-              className="inline-flex items-center gap-1.5 rounded-md border border-[#E2E0D8] bg-white px-3.5 py-2 text-xs font-medium text-[#17191C] hover:bg-[#F0EFEA]"
+              className="synth-pad inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold"
             >
-              <RotateCcw className="h-3.5 w-3.5" strokeWidth={1.75} />
+              <RotateCcw className="h-3.5 w-3.5" strokeWidth={2} />
               <span>結束模擬、回到完整題庫</span>
             </button>
           )}
         </div>
-      </div>
+      </section>
 
-      {/* Filter Bar */}
+      {/* Hardware Filter Strip */}
       {!mockMode && (
-        <div className="rounded-lg border border-[#E2E0D8] bg-white p-4">
+        <div className="synth-panel p-4">
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
             <label className="text-xs">
-              <span className="mb-1 flex items-center gap-1 font-semibold text-[#525866]">
-                <Filter className="h-3 w-3" strokeWidth={1.75} /> 主題單元
+              <span className="mb-1.5 flex items-center gap-1 font-bold text-[#4B5565]">
+                <Filter className="h-3.5 w-3.5" strokeWidth={2} /> 主題模組
               </span>
               <select
                 value={topicFilter}
@@ -191,9 +190,9 @@ export function PracticeWorkbenchClient({
                   setAssignmentId(null);
                   applyFilters(v, typeFilter, diffFilter, statusFilter, null);
                 }}
-                className="w-full rounded border border-[#E2E0D8] bg-[#F7F6F2] px-2.5 py-1.5 text-sm text-[#17191C]"
+                className="w-full rounded-lg border-[1.5px] border-[#C4CBD6] bg-white px-2.5 py-2 text-sm font-medium text-[#11151C]"
               >
-                <option value="all">全部五大主題</option>
+                <option value="all">全部五大模組</option>
                 {topics.map((t) => (
                   <option key={t.id} value={t.slug}>
                     {t.title}
@@ -203,7 +202,7 @@ export function PracticeWorkbenchClient({
             </label>
 
             <label className="text-xs">
-              <span className="mb-1 block font-semibold text-[#525866]">認知題型</span>
+              <span className="mb-1.5 block font-bold text-[#4B5565]">考法題型</span>
               <select
                 value={typeFilter}
                 onChange={(e) => {
@@ -212,9 +211,9 @@ export function PracticeWorkbenchClient({
                   setAssignmentId(null);
                   applyFilters(topicFilter, v, diffFilter, statusFilter, null);
                 }}
-                className="w-full rounded border border-[#E2E0D8] bg-[#F7F6F2] px-2.5 py-1.5 text-sm text-[#17191C]"
+                className="w-full rounded-lg border-[1.5px] border-[#C4CBD6] bg-white px-2.5 py-2 text-sm font-medium text-[#11151C]"
               >
-                <option value="all">全部六大題型</option>
+                <option value="all">全部六大考法</option>
                 {(Object.keys(QUESTION_TYPE_LABELS) as QuestionType[]).map((qt) => (
                   <option key={qt} value={qt}>
                     {QUESTION_TYPE_LABELS[qt]}
@@ -224,7 +223,7 @@ export function PracticeWorkbenchClient({
             </label>
 
             <label className="text-xs">
-              <span className="mb-1 block font-semibold text-[#525866]">難度</span>
+              <span className="mb-1.5 block font-bold text-[#4B5565]">題目難度</span>
               <select
                 value={diffFilter}
                 onChange={(e) => {
@@ -233,7 +232,7 @@ export function PracticeWorkbenchClient({
                   setAssignmentId(null);
                   applyFilters(topicFilter, typeFilter, v, statusFilter, null);
                 }}
-                className="w-full rounded border border-[#E2E0D8] bg-[#F7F6F2] px-2.5 py-1.5 text-sm text-[#17191C]"
+                className="w-full rounded-lg border-[1.5px] border-[#C4CBD6] bg-white px-2.5 py-2 text-sm font-medium text-[#11151C]"
               >
                 <option value="all">全部難度</option>
                 {(Object.keys(DIFFICULTY_LABELS) as Difficulty[]).map((d) => (
@@ -245,7 +244,7 @@ export function PracticeWorkbenchClient({
             </label>
 
             <label className="text-xs">
-              <span className="mb-1 block font-semibold text-[#525866]">個人作答狀態</span>
+              <span className="mb-1.5 block font-bold text-[#4B5565]">破關狀態</span>
               <select
                 value={statusFilter}
                 disabled={!isLoggedIn}
@@ -255,12 +254,12 @@ export function PracticeWorkbenchClient({
                   setAssignmentId(null);
                   applyFilters(topicFilter, typeFilter, diffFilter, v, null);
                 }}
-                className="w-full rounded border border-[#E2E0D8] bg-[#F7F6F2] px-2.5 py-1.5 text-sm text-[#17191C] disabled:opacity-50"
+                className="w-full rounded-lg border-[1.5px] border-[#C4CBD6] bg-white px-2.5 py-2 text-sm font-medium text-[#11151C] disabled:opacity-50"
               >
                 <option value="all">全部題目</option>
-                <option value="unsolved">尚未作答</option>
+                <option value="unsolved">尚未挑戰</option>
                 <option value="wrong">答錯待訂正</option>
-                <option value="solved">已答對</option>
+                <option value="solved">已破關</option>
               </select>
             </label>
 
@@ -275,23 +274,23 @@ export function PracticeWorkbenchClient({
                   setAssignmentId(null);
                   applyFilters("all", "all", "all", "all", null);
                 }}
-                className="w-full rounded border border-[#E2E0D8] bg-white px-3 py-1.5 text-xs font-medium text-[#525866] hover:bg-[#F0EFEA] hover:text-[#17191C]"
+                className="synth-pad w-full py-2 text-xs font-bold"
               >
-                清除篩選條件
+                重設所有篩選
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Mock Exam Summary Banner */}
+      {/* Mock Exam OLED Summary Banner */}
       {mockMode && (
-        <div className="rounded-lg border border-[#1E4E8C]/30 bg-[#EAF1FA] p-4 flex flex-wrap items-center justify-between gap-3">
-          <div className="flex items-center gap-2 text-sm font-medium text-[#1E4E8C]">
-            <ClipboardCheck className="h-5 w-5" strokeWidth={1.75} />
-            <span>
-              模擬測驗進度：已作答 {mockAnsweredCount} / {questions.length} 題 · 答對{" "}
-              {mockCorrectCount} 題（正確率{" "}
+        <div className="synth-oled p-4 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5 text-sm font-bold text-white">
+            <ClipboardCheck className="h-5 w-5 text-[#FF8A65]" strokeWidth={2} />
+            <span className="tabular-nums">
+              模擬考進度：已作答 {mockAnsweredCount} / {questions.length} 題 · 答對{" "}
+              <span className="text-[#00E5A0]">{mockCorrectCount}</span> 題（正確率{" "}
               {mockAnsweredCount > 0
                 ? Math.round((mockCorrectCount / mockAnsweredCount) * 100)
                 : 0}
@@ -299,72 +298,87 @@ export function PracticeWorkbenchClient({
             </span>
           </div>
           {isLoggedIn && (
-            <Link href="/dashboard" className="text-xs font-semibold text-[#1E4E8C] underline">
-              前往儀表板查看能力分析
+            <Link
+              href="/dashboard"
+              className="text-xs font-bold text-[#38BDF8] hover:underline"
+            >
+              前往我的進度儀表板 →
             </Link>
           )}
         </div>
       )}
 
-      {/* Workbench Split Layout */}
+      {/* Split Sequencer Tracklist + Active Deck */}
       {loading ? (
-        <div className="rounded-lg border border-[#E2E0D8] bg-white p-8 text-center text-sm text-[#525866]">
-          載入題目清單中...
+        <div className="synth-panel p-10 text-center text-sm font-bold text-[#4B5565]">
+          載入題目序列中...
         </div>
       ) : questions.length === 0 ? (
-        <div className="rounded-lg border border-[#E2E0D8] bg-white p-8 text-center space-y-3">
-          <p className="text-sm font-medium text-[#17191C]">目前篩選條件下沒有符合的題目。</p>
-          <p className="text-xs text-[#525866]">
-            試著切換其他主題、清除狀態篩選，或檢視全部 30 道官方範例題。
+        <div className="synth-panel p-10 text-center space-y-2">
+          <p className="text-base font-bold text-[#11151C]">
+            目前篩選條件下沒有符合的題目。
+          </p>
+          <p className="text-xs text-[#4B5565]">
+            請點擊「重設所有篩選」或切換其他主題模組。
           </p>
         </div>
       ) : (
         <div className="grid gap-6 lg:grid-cols-12">
-          {/* Left Question List */}
-          <aside className="lg:col-span-4 space-y-2 max-h-[760px] overflow-y-auto pr-1">
-            <div className="mb-1 text-xs font-semibold text-[#525866] tabular-nums">
-              符合條件共 {questions.length} 題
+          {/* Left Sequencer Tracklist */}
+          <aside className="lg:col-span-4 space-y-2 max-h-[780px] overflow-y-auto pr-1">
+            <div className="mb-1.5 flex items-center justify-between px-1 font-code text-xs font-bold text-[#4B5565] tabular-nums">
+              <span>TRACKLIST // 共 {questions.length} 題</span>
             </div>
             {questions.map((q, idx) => {
               const isActive = activeQuestion?.id === q.id;
               const last = q.user_last_attempt;
+              const theme = getTopicTheme(q.topic_slug);
+
               return (
                 <button
                   key={q.id}
                   type="button"
                   onClick={() => setSelectedId(q.id)}
-                  className={`flex w-full items-start justify-between gap-2 rounded-lg border p-3 text-left ui-transition ${
+                  className={`flex w-full items-start justify-between gap-2.5 rounded-xl border-[1.5px] p-3 text-left ui-transition ${
                     isActive
-                      ? "border-[#1E4E8C] bg-[#EAF1FA]/60"
-                      : "border-[#E2E0D8] bg-white hover:border-[#C9C6BB]"
+                      ? "border-[#161A22] bg-[#FFF1EC] ring-2 ring-[#FF4F17]/30 shadow-xs"
+                      : "border-[#C4CBD6] bg-white hover:border-[#161A22]"
                   }`}
                 >
-                  <div className="space-y-1 min-w-0">
+                  <div className="space-y-1.5 min-w-0">
                     <div className="flex flex-wrap items-center gap-1.5 text-xs">
-                      <span className="font-code text-[#6C7382] tabular-nums">
-                        {idx + 1}.
+                      <span
+                        className={`h-2 w-2 rounded-full ${
+                          isActive ? "bg-[#FF4F17]" : ""
+                        }`}
+                        style={!isActive ? { backgroundColor: theme.hex } : undefined}
+                      />
+                      <span className="font-code text-[#647082] tabular-nums">
+                        {String(idx + 1).padStart(2, "0")}.
                       </span>
                       {q.official_ref && (
-                        <span className="rounded bg-[#17191C] px-1.5 py-0.5 font-code text-[11px] text-white">
+                        <span className="rounded bg-[#161A22] px-1.5 py-0.5 font-code text-[11px] font-bold text-white">
                           {q.official_ref}
                         </span>
                       )}
-                      <span className="text-[11px] text-[#525866]">
+                      <span className="text-[11px] font-bold text-[#4B5565]">
                         {QUESTION_TYPE_LABELS[q.question_type]}
                       </span>
                     </div>
-                    <div className="truncate text-sm font-medium text-[#17191C]">
+                    <div className="truncate text-sm font-bold text-[#11151C]">
                       {q.title}
                     </div>
-                    <div className="text-[11px] text-[#6C7382]">{q.topic_title}</div>
+                    <div className="text-[11px] font-medium text-[#647082]">
+                      {q.topic_title}
+                    </div>
                   </div>
 
                   {last && (
                     <span className="shrink-0 mt-1">
                       {last.is_correct ? (
-                        <CheckCircle2 className="h-4 w-4 text-[#157F4B]" strokeWidth={1.75} />
+                        <CheckCircle2 className="h-4 w-4 text-[#007A57]" strokeWidth={2.2} />
                       ) : (
-                        <XCircle className="h-4 w-4 text-[#C23535]" strokeWidth={1.75} />
+                        <XCircle className="h-4 w-4 text-[#C62828]" strokeWidth={2.2} />
                       )}
                     </span>
                   )}
@@ -373,8 +387,8 @@ export function PracticeWorkbenchClient({
             })}
           </aside>
 
-          {/* Right Active Question */}
-          <div className="lg:col-span-8">
+          {/* Right Active Hardware Card */}
+          <div className="lg:col-span-8 min-w-0">
             {activeQuestion && (
               <PracticeQuestionCard
                 question={activeQuestion}

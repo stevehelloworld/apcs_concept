@@ -116,32 +116,29 @@ export function TeacherAssignmentsClient({
 
   return (
     <div className="space-y-6">
-      <div className="border-b border-[#E2E0D8] pb-4">
-        <h1 className="text-2xl font-bold text-[#17191C]">班級作業指派與完成追蹤</h1>
-        <p className="mt-1 text-sm text-[#525866]">
-          挑選題庫題目指派給特定班級，並即時追蹤班上每位學生的作答完成進度與答對數。
+      <section className="synth-panel-hard p-5">
+        <h1 className="text-2xl font-black text-[#11151C]">班級作業指派與完成追蹤</h1>
+        <p className="mt-1 text-sm text-[#4B5565]">
+          挑選題庫題目指派給特定班級，並即時追蹤班上每位學生的作答完成度與正確數。
         </p>
-      </div>
+      </section>
 
       {/* Create Assignment Form */}
-      <form
-        onSubmit={handleCreate}
-        className="rounded-lg border border-[#E2E0D8] bg-white p-5 space-y-4"
-      >
-        <div className="text-sm font-bold text-[#17191C]">指派新作業任務</div>
+      <form onSubmit={handleCreate} className="synth-panel-hard p-5 space-y-4">
+        <div className="text-sm font-black text-[#11151C]">指派新作業任務</div>
         {classes.length === 0 ? (
-          <p className="text-xs text-[#C23535]">
-            您目前尚未建立任何班級，請先至「班級與學生管理」新增班級後再指派作業。
+          <p className="text-xs font-bold text-[#C62828]">
+            您目前尚未建立任何班級，請先至「班級與學生名冊」新增班級後再指派作業。
           </p>
         ) : (
           <>
             <div className="grid gap-3 sm:grid-cols-3">
               <label className="text-xs">
-                <span className="mb-1 block font-semibold text-[#525866]">目標班級</span>
+                <span className="mb-1 block font-bold text-[#4B5565]">目標班級</span>
                 <select
                   value={classId}
                   onChange={(e) => setClassId(e.target.value)}
-                  className="w-full rounded border border-[#E2E0D8] bg-[#F7F6F2] px-2.5 py-2 text-sm"
+                  className="w-full rounded-xl border-[1.5px] border-[#C4CBD6] bg-[#F8F9FB] px-2.5 py-2 text-sm text-[#11151C]"
                 >
                   {classes.map((c) => (
                     <option key={c.id} value={c.id}>
@@ -152,79 +149,82 @@ export function TeacherAssignmentsClient({
               </label>
 
               <label className="text-xs">
-                <span className="mb-1 block font-semibold text-[#525866]">作業名稱</span>
+                <span className="mb-1 block font-bold text-[#4B5565]">作業名稱</span>
                 <input
                   type="text"
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="如：第二週遞迴堆疊複習"
-                  className="w-full rounded border border-[#E2E0D8] bg-[#F7F6F2] px-3 py-2 text-sm"
+                  className="w-full rounded-xl border-[1.5px] border-[#C4CBD6] bg-[#F8F9FB] px-3 py-2 text-sm text-[#11151C]"
                 />
               </label>
 
               <label className="text-xs">
-                <span className="mb-1 block font-semibold text-[#525866]">截止日期（選填）</span>
+                <span className="mb-1 block font-bold text-[#4B5565]">截止日期（選填）</span>
                 <input
                   type="date"
                   value={dueDate}
                   onChange={(e) => setDueDate(e.target.value)}
-                  className="w-full rounded border border-[#E2E0D8] bg-[#F7F6F2] px-3 py-2 font-code text-sm"
+                  className="w-full rounded-xl border-[1.5px] border-[#C4CBD6] bg-[#F8F9FB] px-3 py-2 font-code text-sm text-[#11151C]"
                 />
               </label>
             </div>
 
             <label className="block text-xs">
-              <span className="mb-1 block font-semibold text-[#525866]">作答指示說明</span>
+              <span className="mb-1 block font-bold text-[#4B5565]">作答指示說明</span>
               <input
                 type="text"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="例如：請先操作完該單元視覺化實驗後再作答"
-                className="w-full rounded border border-[#E2E0D8] bg-[#F7F6F2] px-3 py-2 text-sm"
+                placeholder="例如：請先操作完該單元互動實驗後再作答"
+                className="w-full rounded-xl border-[1.5px] border-[#C4CBD6] bg-[#F8F9FB] px-3 py-2 text-sm text-[#11151C]"
               />
             </label>
 
             <div>
               <div className="mb-2 flex items-center justify-between text-xs">
-                <span className="font-semibold text-[#525866]">
+                <span className="font-bold text-[#4B5565]">
                   勾選本次作業題目（已選{" "}
-                  <span className="font-code text-[#0F6B5E]">{selectedQIds.length}</span> 題）：
+                  <span className="font-code text-[#007A5B]">{selectedQIds.length}</span>{" "}
+                  題）：
                 </span>
                 {selectedQIds.length > 0 && (
                   <button
                     type="button"
                     onClick={() => setSelectedQIds([])}
-                    className="text-[#525866] hover:underline"
+                    className="font-bold text-[#4B5565] hover:underline"
                   >
                     清空勾選
                   </button>
                 )}
               </div>
 
-              <div className="max-h-52 overflow-y-auto rounded-md border border-[#E2E0D8] bg-[#F7F6F2] p-2.5 grid gap-1.5 sm:grid-cols-2">
+              <div className="synth-recess max-h-56 overflow-y-auto p-3 grid gap-2 sm:grid-cols-2">
                 {questions.map((q) => {
                   const checked = selectedQIds.includes(q.id);
                   return (
                     <label
                       key={q.id}
-                      className={`flex cursor-pointer items-center gap-2 rounded border px-2.5 py-1.5 text-xs ${
+                      className={`flex cursor-pointer items-center gap-2 rounded-lg border px-2.5 py-2 text-xs ui-transition ${
                         checked
-                          ? "border-[#0F6B5E] bg-[#E6F4F1]"
-                          : "border-[#E2E0D8] bg-white"
+                          ? "border-[#161A22] bg-[#E6F7F2]"
+                          : "border-[#C4CBD6] bg-white hover:border-[#161A22]"
                       }`}
                     >
                       <input
                         type="checkbox"
                         checked={checked}
                         onChange={() => toggleQuestion(q.id)}
-                        className="accent-[#0F6B5E]"
+                        className="accent-[#007A5B]"
                       />
-                      <span className="font-code font-semibold text-[#17191C]">
+                      <span className="rounded bg-[#161A22] px-1.5 py-0.5 font-code text-[10px] font-bold text-white">
                         {q.official_ref ?? `#${q.id}`}
                       </span>
-                      <span className="truncate flex-1 text-[#17191C]">{q.title}</span>
-                      <span className="text-[10px] text-[#6C7382]">
+                      <span className="truncate flex-1 font-bold text-[#11151C]">
+                        {q.title}
+                      </span>
+                      <span className="text-[10px] text-[#647082]">
                         {QUESTION_TYPE_LABELS[q.question_type]}
                       </span>
                     </label>
@@ -233,15 +233,15 @@ export function TeacherAssignmentsClient({
               </div>
             </div>
 
-            {error && <p className="text-xs text-[#C23535]">{error}</p>}
+            {error && <p className="text-xs font-bold text-[#C62828]">{error}</p>}
 
             <div className="flex justify-end">
               <button
                 type="submit"
                 disabled={creating}
-                className="inline-flex items-center gap-1.5 rounded-md bg-[#0F6B5E] px-4 py-2 text-sm font-medium text-white hover:bg-[#0B5349] disabled:opacity-50"
+                className="synth-pad-emerald inline-flex items-center gap-1.5 px-5 py-2 text-sm font-bold disabled:opacity-50"
               >
-                <Plus className="h-4 w-4" strokeWidth={1.75} />
+                <Plus className="h-4 w-4" strokeWidth={2} />
                 <span>{creating ? "發佈中..." : "指派作業"}</span>
               </button>
             </div>
@@ -252,34 +252,31 @@ export function TeacherAssignmentsClient({
       {/* Existing Assignments List */}
       <div className="space-y-4">
         {assignments.length === 0 ? (
-          <div className="rounded-lg border border-dashed border-[#E2E0D8] bg-white p-6 text-center text-xs text-[#525866]">
+          <div className="synth-panel p-6 text-center text-xs text-[#4B5565]">
             尚未指派任何作業任務。
           </div>
         ) : (
           assignments.map((a) => (
-            <div
-              key={a.id}
-              className="rounded-lg border border-[#E2E0D8] bg-white p-5 space-y-3"
-            >
+            <div key={a.id} className="synth-panel-hard p-5 space-y-3.5">
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
                   <div className="flex flex-wrap items-center gap-2 text-xs">
-                    <span className="rounded bg-[#E6F4F1] px-2 py-0.5 font-medium text-[#0F6B5E]">
+                    <span className="rounded bg-[#161A22] px-2.5 py-0.5 font-bold text-[#00E5A0]">
                       {a.class_name}
                     </span>
-                    <span className="font-code text-[#525866] tabular-nums">
+                    <span className="font-code font-bold text-[#4B5565] tabular-nums">
                       共 {a.question_ids.length} 題
                     </span>
                     {a.due_date && (
-                      <span className="inline-flex items-center gap-1 font-code text-[#525866]">
-                        <Calendar className="h-3.5 w-3.5" strokeWidth={1.75} />
+                      <span className="inline-flex items-center gap-1 font-code text-[#4B5565]">
+                        <Calendar className="h-3.5 w-3.5" strokeWidth={2} />
                         {a.due_date}
                       </span>
                     )}
                   </div>
-                  <h2 className="mt-1 text-base font-bold text-[#17191C]">{a.title}</h2>
+                  <h2 className="mt-1.5 text-base font-black text-[#11151C]">{a.title}</h2>
                   {a.description && (
-                    <p className="mt-0.5 text-xs text-[#525866]">{a.description}</p>
+                    <p className="mt-0.5 text-xs text-[#4B5565]">{a.description}</p>
                   )}
                 </div>
 
@@ -287,10 +284,10 @@ export function TeacherAssignmentsClient({
                   <button
                     type="button"
                     onClick={() => handleToggle(a)}
-                    className={`rounded px-2.5 py-1 text-xs font-medium ${
+                    className={`rounded-full px-3 py-1 text-xs font-bold ${
                       a.is_published
-                        ? "bg-[#EAF6EF] text-[#157F4B]"
-                        : "bg-[#F0EFEA] text-[#6C7382]"
+                        ? "bg-[#E6FAF3] text-[#007A57]"
+                        : "bg-[#DDE2EA] text-[#4B5565]"
                     }`}
                   >
                     {a.is_published ? "進行中（已開放）" : "已關閉"}
@@ -298,32 +295,32 @@ export function TeacherAssignmentsClient({
                   <button
                     type="button"
                     onClick={() => handleDelete(a.id)}
-                    className="rounded border border-[#E2E0D8] p-1.5 text-[#C23535] hover:bg-[#FCEEEE]"
+                    className="synth-pad p-1.5 text-[#C62828] hover:bg-[#FDECEC]"
                     title="刪除作業"
                   >
-                    <Trash2 className="h-4 w-4" strokeWidth={1.75} />
+                    <Trash2 className="h-4 w-4" strokeWidth={2} />
                   </button>
                 </div>
               </div>
 
               {/* Per-Student Completion Breakdown */}
-              <div className="border-t border-[#E2E0D8] pt-3">
-                <div className="mb-2 text-xs font-semibold text-[#525866]">
+              <div className="border-t border-[#D4DAE4] pt-3">
+                <div className="mb-2 text-xs font-bold text-[#4B5565]">
                   班級學生完成狀態：
                 </div>
                 {a.student_progress.length === 0 ? (
-                  <p className="text-xs text-[#6C7382]">本班尚未有學生加入。</p>
+                  <p className="text-xs text-[#647082]">本班尚未有學生加入。</p>
                 ) : (
                   <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                     {a.student_progress.map((sp) => (
                       <div
                         key={sp.studentId}
-                        className="flex items-center justify-between rounded border border-[#E2E0D8] bg-[#F7F6F2] px-3 py-2 text-xs"
+                        className="flex items-center justify-between rounded-xl border border-[#C4CBD6] bg-[#F8F9FB] px-3 py-2 text-xs"
                       >
-                        <span className="font-medium text-[#17191C]">{sp.displayName}</span>
-                        <span className="font-code tabular-nums text-[#525866]">
+                        <span className="font-bold text-[#11151C]">{sp.displayName}</span>
+                        <span className="font-code tabular-nums text-[#4B5565]">
                           完成 {sp.completedCount}/{a.question_ids.length}（對{" "}
-                          <strong className="text-[#157F4B]">{sp.correctCount}</strong>）
+                          <strong className="text-[#007A57]">{sp.correctCount}</strong>）
                         </span>
                       </div>
                     ))}

@@ -17,3 +17,7 @@ data/*.db*
 # logs & temp
 npm-debug.log*
 .DS_Store
+
+# Impeccable temporary captures & decision mocks
+.impeccable/review/
+.impeccable/mocks/

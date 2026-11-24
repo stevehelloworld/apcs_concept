@@ -50,7 +50,7 @@ export function PracticeQuestionCard({
   async function handleSubmit() {
     if (!selected) return;
     if (!isLoggedIn) {
-      setErrorMsg("請先登入學生帳號，即可立即批改、取得迷思診斷並保存作答紀錄。");
+      setErrorMsg("請先登入學生帳號，即可即時批改、檢視錯題診斷並保存通關燈號。");
       return;
     }
 
@@ -84,23 +84,23 @@ export function PracticeQuestionCard({
   }
 
   return (
-    <article className="rounded-lg border border-[#E2E0D8] bg-white p-5">
-      {/* Header meta row */}
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-[#E2E0D8] pb-3">
+    <article className="synth-panel-hard p-5 sm:p-6">
+      {/* Header Meta Strip */}
+      <div className="mb-3.5 flex flex-wrap items-center justify-between gap-2 border-b border-[#C4CBD6] pb-3.5">
         <div className="flex flex-wrap items-center gap-2">
           {question.official_ref && (
-            <span className="rounded bg-[#17191C] px-2 py-0.5 font-code text-xs font-medium text-white">
+            <span className="rounded-md bg-[#161A22] px-2.5 py-0.5 font-code text-xs font-bold text-white">
               {question.official_ref}
             </span>
           )}
-          <span className="rounded border border-[#E2E0D8] bg-[#F7F6F2] px-2 py-0.5 text-xs font-medium text-[#17191C]">
+          <span className="rounded-md border border-[#C4CBD6] bg-[#F8F9FB] px-2.5 py-0.5 text-xs font-bold text-[#11151C]">
             {QUESTION_TYPE_LABELS[question.question_type]}
           </span>
-          <span className="rounded border border-[#E2E0D8] bg-white px-2 py-0.5 text-xs text-[#525866]">
+          <span className="rounded-md border border-[#C4CBD6] bg-white px-2.5 py-0.5 text-xs font-medium text-[#4B5565]">
             {DIFFICULTY_LABELS[question.difficulty]}
           </span>
           {question.class_name && (
-            <span className="rounded bg-[#E6F4F1] px-2 py-0.5 text-xs font-medium text-[#0F6B5E]">
+            <span className="rounded-md bg-[#E6F7F2] px-2.5 py-0.5 text-xs font-bold text-[#007A5B]">
               班級專屬：{question.class_name}
             </span>
           )}
@@ -108,52 +108,63 @@ export function PracticeQuestionCard({
 
         {question.user_last_attempt && !result && (
           <span
-            className={`inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs font-medium ${
+            className={`inline-flex items-center gap-1.5 rounded-full border px-3 py-0.5 text-xs font-bold ${
               question.user_last_attempt.is_correct
-                ? "bg-[#EAF6EF] text-[#157F4B]"
-                : "bg-[#FCEEEE] text-[#C23535]"
+                ? "border-[#9EE7D0] bg-[#E6FAF3] text-[#007A57]"
+                : "border-[#F9B4B4] bg-[#FDECEC] text-[#C62828]"
             }`}
           >
-            {question.user_last_attempt.is_correct ? (
-              <>
-                <CheckCircle2 className="h-3.5 w-3.5" strokeWidth={1.75} />
-                <span>上次答對（選 {question.user_last_attempt.selected_option}）</span>
-              </>
-            ) : (
-              <>
-                <XCircle className="h-3.5 w-3.5" strokeWidth={1.75} />
-                <span>待訂正（上次選 {question.user_last_attempt.selected_option}）</span>
-              </>
-            )}
+            <span
+              className={`h-2 w-2 rounded-full ${
+                question.user_last_attempt.is_correct
+                  ? "bg-[#00C48C]"
+                  : "bg-[#FF4757]"
+              }`}
+            />
+            <span>
+              {question.user_last_attempt.is_correct
+                ? `已破關（選 ${question.user_last_attempt.selected_option}）`
+                : `待訂正（上次選 ${question.user_last_attempt.selected_option}）`}
+            </span>
           </span>
         )}
       </div>
 
-      <h3 className="mb-3 text-base font-semibold text-[#17191C]">{question.title}</h3>
+      <h3 className="mb-4 text-lg font-bold text-[#11151C]">{question.title}</h3>
 
       <div className="grid gap-5 lg:grid-cols-12">
-        {/* Left: Prompt & Options */}
+        {/* Left: Prompt & Keycap Options */}
         <div className="flex flex-col justify-between gap-4 lg:col-span-6">
           <div className="space-y-4">
-            <p className="whitespace-pre-line text-sm leading-relaxed text-[#17191C]">
+            <p className="whitespace-pre-line text-[15px] leading-relaxed text-[#11151C]">
               {question.prompt}
             </p>
 
-            <div className="space-y-2" role="radiogroup" aria-label={`題目 ${question.title} 選項`}>
+            <div
+              className="space-y-2.5"
+              role="radiogroup"
+              aria-label={`題目 ${question.title} 選項`}
+            >
               {question.options.map((opt) => {
                 const isSelected = selected === opt.key;
                 const isCorrectOpt = result && result.correctOption === opt.key;
                 const isWrongSelected =
                   result && result.selectedOption === opt.key && !result.isCorrect;
 
-                let btnStyle =
-                  "border-[#E2E0D8] bg-white text-[#17191C] hover:border-[#1E4E8C] hover:bg-[#EAF1FA]/40";
+                let btnCls =
+                  "border-[#C4CBD6] bg-[#F8F9FB] text-[#11151C] hover:border-[#161A22] hover:bg-white";
+                let badgeCls =
+                  "border-[#161A22] bg-white text-[#11151C]";
+
                 if (isCorrectOpt) {
-                  btnStyle = "border-[#157F4B] bg-[#EAF6EF] text-[#157F4B]";
+                  btnCls = "border-[#007A57] bg-[#E6FAF3] text-[#005C41]";
+                  badgeCls = "border-[#007A57] bg-[#007A57] text-white";
                 } else if (isWrongSelected) {
-                  btnStyle = "border-[#C23535] bg-[#FCEEEE] text-[#C23535]";
+                  btnCls = "border-[#C62828] bg-[#FDECEC] text-[#A61B1B]";
+                  badgeCls = "border-[#C62828] bg-[#C62828] text-white";
                 } else if (isSelected) {
-                  btnStyle = "border-[#1E4E8C] bg-[#EAF1FA] text-[#1E4E8C]";
+                  btnCls = "border-[#161A22] bg-[#FFF1EC] text-[#11151C] ring-2 ring-[#FF4F17]/30";
+                  badgeCls = "border-[#161A22] bg-[#D93B09] text-white";
                 }
 
                 return (
@@ -165,12 +176,14 @@ export function PracticeQuestionCard({
                       setErrorMsg(null);
                     }}
                     disabled={submitting}
-                    className={`flex w-full items-start gap-3 rounded-md border px-3.5 py-2.5 text-left text-sm ui-transition ${btnStyle}`}
+                    className={`flex w-full items-start gap-3 rounded-xl border-[1.5px] px-3.5 py-2.5 text-left text-sm ui-transition ${btnCls}`}
                   >
-                    <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded border border-current font-code text-xs font-semibold">
+                    <span
+                      className={`mt-0.5 inline-flex h-6 w-6 shrink-0 items-center justify-center rounded-md border-[1.5px] font-code text-xs font-bold ${badgeCls}`}
+                    >
                       {opt.key}
                     </span>
-                    <span className="font-code text-[13px] leading-snug break-all">
+                    <span className="font-code text-[13px] font-medium leading-snug break-all pt-0.5">
                       {opt.text}
                     </span>
                   </button>
@@ -179,16 +192,16 @@ export function PracticeQuestionCard({
             </div>
           </div>
 
-          <div className="space-y-2.5 pt-1">
+          <div className="space-y-3 pt-1">
             {errorMsg && (
-              <div className="flex items-start gap-2 rounded-md border border-[#C23535]/30 bg-[#FCEEEE] px-3 py-2 text-xs text-[#C23535]">
-                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={1.75} />
+              <div className="flex items-start gap-2 rounded-xl border-[1.5px] border-[#F9B4B4] bg-[#FDECEC] px-3.5 py-2.5 text-xs font-medium text-[#C62828]">
+                <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" strokeWidth={2} />
                 <div className="flex-1">
                   <span>{errorMsg}</span>
                   {!isLoggedIn && (
                     <Link
                       href="/login"
-                      className="ml-2 font-semibold underline hover:opacity-80"
+                      className="ml-2 font-bold underline hover:opacity-80"
                     >
                       前往登入
                     </Link>
@@ -197,73 +210,85 @@ export function PracticeQuestionCard({
               </div>
             )}
 
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <span className="inline-flex items-center gap-1 text-xs text-[#6C7382]">
-                <Clock className="h-3.5 w-3.5" strokeWidth={1.75} />
-                <span>提交後立即顯示迷思診斷與詳解</span>
+            <div className="flex flex-wrap items-center justify-between gap-2.5">
+              <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#4B5565]">
+                <Clock className="h-3.5 w-3.5" strokeWidth={2} />
+                <span>提交後立即顯示迷思診斷與解答</span>
               </span>
 
               <button
                 type="button"
                 onClick={handleSubmit}
                 disabled={!selected || submitting}
-                className="inline-flex items-center gap-1.5 rounded-md bg-[#1E4E8C] px-4 py-2 text-sm font-medium text-white ui-transition hover:bg-[#163C6E] disabled:cursor-not-allowed disabled:opacity-45"
+                className="synth-pad-orange inline-flex items-center gap-1.5 px-5 py-2.5 text-sm font-bold disabled:cursor-not-allowed disabled:opacity-45"
               >
-                <Send className="h-3.5 w-3.5" strokeWidth={1.75} />
-                <span>{submitting ? "批改中..." : result ? "重新作答提交" : "提交答案"}</span>
+                <Send className="h-3.5 w-3.5" strokeWidth={2.2} />
+                <span>
+                  {submitting
+                    ? "批改中..."
+                    : result
+                    ? "再挑戰一次"
+                    : "送出看診斷"}
+                </span>
               </button>
             </div>
           </div>
         </div>
 
-        {/* Right: Python Code */}
+        {/* Right: OLED Python Code */}
         <div className="lg:col-span-6">
           <PythonCodeView
             code={question.code}
-            caption={question.official_ref ? `APCS ${question.official_ref}` : "Python 程式碼"}
+            caption={
+              question.official_ref
+                ? `APCS ${question.official_ref} // CODE`
+                : "PYTHON 3 // CODE"
+            }
           />
         </div>
       </div>
 
       {/* Diagnostic Feedback Panel */}
       {result && (
-        <div className="mt-5 space-y-4 border-t border-[#E2E0D8] pt-4">
+        <div className="mt-6 space-y-4 border-t-2 border-[#C4CBD6] pt-5">
           <div
-            className={`rounded-md border p-4 ${
+            className={`rounded-xl border-2 p-4 ${
               result.isCorrect
-                ? "border-[#157F4B]/30 bg-[#EAF6EF]"
-                : "border-[#C23535]/30 bg-[#FCEEEE]"
+                ? "border-[#007A57] bg-[#E6FAF3]"
+                : "border-[#C62828] bg-[#FDECEC]"
             }`}
           >
             <div className="mb-1.5 flex items-center gap-2">
               {result.isCorrect ? (
-                <CheckCircle2 className="h-5 w-5 text-[#157F4B]" strokeWidth={1.75} />
+                <CheckCircle2 className="h-5 w-5 text-[#007A57]" strokeWidth={2.2} />
               ) : (
-                <XCircle className="h-5 w-5 text-[#C23535]" strokeWidth={1.75} />
+                <XCircle className="h-5 w-5 text-[#C62828]" strokeWidth={2.2} />
               )}
               <span
-                className={`text-sm font-semibold ${
-                  result.isCorrect ? "text-[#157F4B]" : "text-[#C23535]"
+                className={`text-sm font-bold ${
+                  result.isCorrect ? "text-[#007A57]" : "text-[#C62828]"
                 }`}
               >
                 {result.isCorrect
-                  ? `答對了！正確答案為 (${result.correctOption})`
-                  : `答錯了（你選 (${result.selectedOption})，正確答案為 (${result.correctOption})）`}
+                  ? `破關成功！正確答案就是 (${result.correctOption})`
+                  : `答錯了（你選 (${result.selectedOption})，正確答案是 (${result.correctOption})）`}
               </span>
             </div>
             {result.selectedMisconception && (
-              <p className="text-sm leading-relaxed text-[#17191C]">
-                <span className="font-semibold">
-                  {result.isCorrect ? "觀念確認：" : "選項迷思診斷："}
+              <p className="text-sm leading-relaxed text-[#11151C]">
+                <span className="font-bold">
+                  {result.isCorrect ? "觀念確認：" : "抓到迷思陷阱："}
                 </span>
                 {result.selectedMisconception}
               </p>
             )}
           </div>
 
-          <div className="rounded-md border border-[#E2E0D8] bg-[#F7F6F2] p-4">
-            <div className="mb-1.5 text-xs font-semibold text-[#525866]">考場手解法詳解</div>
-            <p className="whitespace-pre-line text-sm leading-relaxed text-[#17191C]">
+          <div className="rounded-xl bg-[#F3F5F8] p-4 border border-[#C4CBD6]">
+            <div className="mb-1.5 font-display text-xs font-bold text-[#4B5565]">
+              SOLVE // 考場手解法詳解
+            </div>
+            <p className="whitespace-pre-line text-sm leading-relaxed text-[#11151C]">
               {result.explanation}
             </p>
           </div>
@@ -273,23 +298,27 @@ export function PracticeQuestionCard({
               <button
                 type="button"
                 onClick={() => setShowTrace((prev) => !prev)}
-                className="inline-flex items-center gap-1.5 rounded-md border border-[#1E4E8C]/30 bg-[#EAF1FA] px-3.5 py-2 text-sm font-medium text-[#1E4E8C] ui-transition hover:bg-[#dce8f8]"
+                className="synth-pad-dark inline-flex items-center gap-2 px-4 py-2 text-xs font-bold"
               >
-                <PlayCircle className="h-4 w-4" strokeWidth={1.75} />
-                <span>{showTrace ? "收合單步執行追蹤器" : "用單步執行追蹤器重播本題"}</span>
+                <PlayCircle className="h-4 w-4 text-[#FF4F17]" strokeWidth={2} />
+                <span>
+                  {showTrace
+                    ? "收合單步執行追蹤器"
+                    : "用單步執行追蹤器重播本題"}
+                </span>
                 {showTrace ? (
-                  <ChevronUp className="h-4 w-4" strokeWidth={1.75} />
+                  <ChevronUp className="h-4 w-4" strokeWidth={2} />
                 ) : (
-                  <ChevronDown className="h-4 w-4" strokeWidth={1.75} />
+                  <ChevronDown className="h-4 w-4" strokeWidth={2} />
                 )}
               </button>
 
               {showTrace && (
-                <div className="mt-3">
+                <div className="mt-4">
                   <CodeTraceStepper
                     code={question.code}
                     steps={result.traceSteps}
-                    title={`${question.title} — 追蹤重播`}
+                    title={`${question.title} — 單步追蹤重播`}
                   />
                 </div>
               )}

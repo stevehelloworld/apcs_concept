@@ -1,21 +1,23 @@
 import Link from "next/link";
 import {
   ArrowRight,
-  BookOpen,
   Compass,
+  Cpu,
+  FlaskConical,
   GraduationCap,
-  Layers,
   Terminal,
+  Zap,
 } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
 import { listPublishedTopics } from "@/lib/queries";
+import { getTopicTheme, QUESTION_TYPE_PAD_CODES } from "@/lib/topic-theme";
 import {
   QUESTION_TYPE_DESCRIPTIONS,
   QUESTION_TYPE_LABELS,
   type QuestionType,
+  type TraceStep,
 } from "@/lib/types";
 import { CodeTraceStepper } from "@/components/CodeTraceStepper";
-import type { TraceStep } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -33,21 +35,21 @@ const HERO_DEMO_STEPS: TraceStep[] = [
     vars: { m: 1 },
     stack: ["f1(1)"],
     output: "1",
-    note: "去程：呼叫 f2(3) 前先印出 1，f1(1) 暫停於呼叫堆疊中。",
+    note: "去程：呼叫 f2(3) 前先印出 1，f1(1) 暫停留在呼叫堆疊中。",
   },
   {
     line: 6,
     vars: { m: 1, "呼叫": "f2(3) -> f1(2) -> f2(4)" },
     stack: ["f1(1)", "f2(3)", "f1(2)", "f2(4)"],
     output: "1\n3\n2\n4",
-    note: "一路展開至 f2(4) > 3 觸底回傳，接著按後進先出順序執行回程。",
+    note: "一路展開到 f2(4) > 3 觸底回傳，接著按後進先出依序倒車回程。",
   },
   {
     line: 7,
     vars: { m: 1, "狀態": "回程對稱輸出" },
     stack: ["f1(1)"],
     output: "1\n3\n2\n4\n2\n3\n1",
-    note: "回到第 7 行再印一次 1，形成完美對稱軌跡 1 3 2 4 2 3 1（Q8 原型）。",
+    note: "退回第 7 行再印出 1，完成對稱輸出 1 3 2 4 2 3 1（Q8 原型）。",
   },
 ];
 
@@ -58,72 +60,85 @@ export default async function HomePage() {
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 sm:py-10 space-y-12">
-      {/* Hero Thesis + Immediate Mechanism Proof */}
+      {/* First Viewport: Split Instrument Console */}
       <section className="grid gap-8 lg:grid-cols-12 lg:items-start">
         <div className="lg:col-span-5 space-y-5">
-          <h1 className="text-3xl font-bold tracking-tight text-[#17191C] sm:text-4xl leading-tight">
-            APCS Python 程式識讀
-            <br />
-            互動追蹤與班級實驗室
+          <h1 className="text-3xl font-black tracking-tight text-[#11151C] sm:text-[40px] leading-[1.18]">
+            把 Python 程式跑起來看懂，
+            <span className="text-[#D93B09]">不再靠死背猜答案</span>
           </h1>
-          <p className="text-[15px] leading-relaxed text-[#525866]">
-            依據官方 2025 APCS「程式識讀 Python 題本範例（0915 版，全 30 題）」建構。
-            不讓學生只看靜態解答背答案，而是用單步變數追蹤表、迷思選項即時診斷與五大主題視覺化實驗室，真正看懂迴圈邊界、遞迴堆疊與演算法陷阱。
+
+          <p className="max-w-prose text-[15px] leading-relaxed text-[#4B5565]">
+            完整收錄 2025 APCS Python 0915 官方全 30 題，專為國高中生打造的互動程式實驗台。直接拖曳右側步驟滑桿追蹤變數與 Call Stack，再用五大主題互動儀器把迴圈邊界、二維陣列與遞迴一次搞懂。
           </p>
 
           <div className="flex flex-wrap gap-3 pt-1">
             <Link
               href="/topics"
-              className="inline-flex items-center gap-2 rounded-md bg-[#1E4E8C] px-4 py-2.5 text-sm font-medium text-white ui-transition hover:bg-[#163C6E]"
+              className="synth-pad-orange inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold"
             >
-              <Compass className="h-4 w-4" strokeWidth={1.75} />
-              <span>探索五大主題導覽</span>
+              <Compass className="h-4 w-4" strokeWidth={2.2} />
+              <span>打開五大模組地圖</span>
             </Link>
             <Link
               href="/practice"
-              className="inline-flex items-center gap-2 rounded-md border border-[#E2E0D8] bg-white px-4 py-2.5 text-sm font-medium text-[#17191C] ui-transition hover:border-[#C9C6BB] hover:bg-[#F0EFEA]"
+              className="synth-pad inline-flex items-center gap-2 px-5 py-2.5 text-sm font-bold"
             >
-              <Terminal className="h-4 w-4" strokeWidth={1.75} />
-              <span>進入刷題工作台</span>
+              <Terminal className="h-4 w-4" strokeWidth={2} />
+              <span>進入刷題實驗台</span>
             </Link>
             {user?.role === "teacher" ? (
               <Link
                 href="/teacher"
-                className="inline-flex items-center gap-2 rounded-md border border-[#0F6B5E] bg-[#E6F4F1] px-4 py-2.5 text-sm font-medium text-[#0F6B5E] ui-transition hover:bg-[#d5ece7]"
+                className="synth-pad-emerald inline-flex items-center gap-2 px-4 py-2.5 text-sm font-bold"
               >
-                <GraduationCap className="h-4 w-4" strokeWidth={1.75} />
-                <span>進入教師後台</span>
+                <GraduationCap className="h-4 w-4" strokeWidth={2} />
+                <span>教師控制台</span>
               </Link>
             ) : !user ? (
               <Link
                 href="/login"
-                className="inline-flex items-center gap-2 rounded-md border border-[#E2E0D8] bg-[#F0EFEA] px-4 py-2.5 text-sm font-medium text-[#17191C] ui-transition hover:bg-[#E5E3DC]"
+                className="synth-pad-dark inline-flex items-center gap-2 px-4 py-2.5 text-sm font-bold"
               >
-                <span>登入師生帳號</span>
-                <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
+                <span>師生登入</span>
+                <ArrowRight className="h-4 w-4" strokeWidth={2} />
               </Link>
             ) : (
               <Link
                 href="/dashboard"
-                className="inline-flex items-center gap-2 rounded-md border border-[#1E4E8C]/30 bg-[#EAF1FA] px-4 py-2.5 text-sm font-medium text-[#1E4E8C] ui-transition hover:bg-[#dce8f8]"
+                className="synth-pad-dark inline-flex items-center gap-2 px-4 py-2.5 text-sm font-bold"
               >
-                <span>查看個人學習進度</span>
+                <span>我的學習進度</span>
+                <ArrowRight className="h-4 w-4" strokeWidth={2} />
               </Link>
             )}
           </div>
 
-          <div className="grid grid-cols-3 gap-3 border-t border-[#E2E0D8] pt-4">
-            <div>
-              <div className="font-code text-xl font-bold text-[#17191C] tabular-nums">5 單元</div>
-              <div className="text-xs text-[#525866]">專屬互動視覺化</div>
+          {/* 3-Slot Recessed OLED Telemetry Counter */}
+          <div className="synth-oled grid grid-cols-3 divide-x divide-[#262F3F] p-3.5">
+            <div className="pr-3">
+              <div className="font-display text-2xl font-bold text-[#FF8A65] tabular-nums">
+                05
+              </div>
+              <div className="mt-0.5 text-[11px] font-medium text-[#A8B6CC]">
+                互動實驗模組
+              </div>
             </div>
-            <div>
-              <div className="font-code text-xl font-bold text-[#17191C] tabular-nums">30 真題</div>
-              <div className="text-xs text-[#525866]">逐選項迷思診斷</div>
+            <div className="px-3">
+              <div className="font-display text-2xl font-bold text-[#00E5A0] tabular-nums">
+                30
+              </div>
+              <div className="mt-0.5 text-[11px] font-medium text-[#A8B6CC]">
+                官方範例真題
+              </div>
             </div>
-            <div>
-              <div className="font-code text-xl font-bold text-[#17191C] tabular-nums">6 題型</div>
-              <div className="text-xs text-[#525866]">跨主題弱點矩陣</div>
+            <div className="pl-3">
+              <div className="font-display text-2xl font-bold text-[#38BDF8] tabular-nums">
+                06
+              </div>
+              <div className="mt-0.5 text-[11px] font-medium text-[#A8B6CC]">
+                題型特訓關卡
+              </div>
             </div>
           </div>
         </div>
@@ -132,139 +147,202 @@ export default async function HomePage() {
           <CodeTraceStepper
             code={HERO_DEMO_CODE}
             steps={HERO_DEMO_STEPS}
-            title="即時機制預覽：Q8 遞迴去程與回程 Call Stack 追蹤"
+            title="即時追蹤示範：Q8 遞迴去程與回程 Call Stack"
           />
         </div>
       </section>
 
-      {/* Five Topics Structured Directory */}
+      {/* Five Hardware Topic Modules (Asymmetric 2 + 3 Rack) */}
       <section className="space-y-4">
-        <div className="flex flex-wrap items-end justify-between gap-2 border-b border-[#E2E0D8] pb-3">
+        <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <h2 className="text-xl font-bold text-[#17191C]">五大知識主題學習路線</h2>
-            <p className="mt-1 text-sm text-[#525866]">
-              完整涵蓋官方 0915 範例題本 30 題，每單元皆附六段式教學與專屬視覺化實驗室
+            <h2 className="text-2xl font-black text-[#11151C]">五大主題互動模組機櫃</h2>
+            <p className="mt-1 text-sm text-[#4B5565]">
+              每個單元都是一台可親手調參數、看動畫的專用實驗儀器，完整涵蓋 APCS 0915 範例 30 題
             </p>
           </div>
           <Link
             href="/topics"
-            className="inline-flex items-center gap-1 text-sm font-medium text-[#1E4E8C] hover:underline"
+            className="synth-pad inline-flex items-center gap-1.5 px-3.5 py-2 text-xs font-bold"
           >
-            <span>開啟完整雙軸目錄</span>
-            <ArrowRight className="h-4 w-4" strokeWidth={1.75} />
+            <span>查看 30 題完整關卡矩陣</span>
+            <ArrowRight className="h-3.5 w-3.5" strokeWidth={2.2} />
           </Link>
         </div>
 
-        <div className="overflow-hidden rounded-lg border border-[#E2E0D8] bg-white divide-y divide-[#E2E0D8]">
-          {topics.map((topic, idx) => (
-            <div
-              key={topic.id}
-              className="grid gap-4 p-4 sm:p-5 lg:grid-cols-12 lg:items-center hover:bg-[#F7F6F2]/60 ui-transition"
-            >
-              <div className="lg:col-span-5 space-y-1">
-                <div className="flex items-center gap-2">
-                  <span className="font-code text-xs font-semibold text-[#1E4E8C]">
-                    主題 {idx + 1}
-                  </span>
-                  <span className="text-xs text-[#6C7382]">·</span>
-                  <span className="text-xs text-[#525866]">{topic.exam_weight}</span>
+        <div className="grid gap-4 md:grid-cols-6">
+          {topics.map((topic, idx) => {
+            const theme = getTopicTheme(topic.slug, idx);
+            const spanClass = idx < 2 ? "md:col-span-3" : "md:col-span-2";
+            const solvedRatio =
+              topic.student_correct !== undefined && topic.question_count > 0
+                ? Math.round((topic.student_correct / topic.question_count) * 100)
+                : null;
+
+            return (
+              <article
+                key={topic.id}
+                className={`${spanClass} synth-panel-hard overflow-hidden flex flex-col justify-between`}
+              >
+                <div>
+                  {/* Color Channel Top Bar */}
+                  <div
+                    className="h-2 w-full"
+                    style={{ backgroundColor: theme.hex }}
+                  />
+
+                  <div className="p-5 space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <span
+                        className="inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 font-display text-xs font-bold"
+                        style={{
+                          backgroundColor: theme.softBg,
+                          borderColor: theme.border,
+                          color: theme.text,
+                        }}
+                      >
+                        <span
+                          className="h-2 w-2 rounded-full"
+                          style={{ backgroundColor: theme.hex }}
+                        />
+                        {theme.code}
+                      </span>
+
+                      <div className="flex items-center gap-2 font-code text-xs text-[#4B5565] tabular-nums">
+                        {topic.student_correct !== undefined && (
+                          <span className="rounded-full bg-[#E6FAF3] px-2 py-0.5 font-bold text-[#007A57]">
+                            {topic.student_correct}/{topic.question_count} 過關
+                          </span>
+                        )}
+                        <span className="font-bold text-[#11151C]">
+                          {topic.question_count} 題
+                        </span>
+                      </div>
+                    </div>
+
+                    <h3 className="text-lg font-black text-[#11151C] leading-snug">
+                      <Link
+                        href={`/topics/${topic.slug}`}
+                        className="hover:underline"
+                      >
+                        {topic.title}
+                      </Link>
+                    </h3>
+
+                    <p className="text-sm leading-relaxed text-[#4B5565]">
+                      {topic.summary}
+                    </p>
+
+                    <div className="inline-flex items-center gap-1.5 rounded-lg bg-[#F1F3F7] border border-[#D4DAE4] px-2.5 py-1 text-xs font-bold text-[#11151C]">
+                      <FlaskConical className="h-3.5 w-3.5 shrink-0" strokeWidth={2} />
+                      <span>儀器：{theme.labLabel}</span>
+                    </div>
+
+                    {solvedRatio !== null && (
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-[#DDE2EA]">
+                        <div
+                          style={{
+                            width: `${solvedRatio}%`,
+                            backgroundColor: theme.hex,
+                          }}
+                          className="h-full ui-transition"
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
-                <h3 className="text-base font-semibold text-[#17191C]">
-                  <Link href={`/topics/${topic.slug}`} className="hover:text-[#1E4E8C]">
-                    {topic.title}
-                  </Link>
-                </h3>
-                <p className="text-sm text-[#525866] leading-relaxed">{topic.summary}</p>
-              </div>
 
-              <div className="lg:col-span-4 flex flex-wrap gap-1.5">
-                {topic.question_types.map((qt) => (
-                  <span
-                    key={qt}
-                    className="rounded border border-[#E2E0D8] bg-[#F7F6F2] px-2 py-0.5 text-xs text-[#525866]"
+                <div className="flex flex-wrap items-center gap-2 border-t border-[#D4DAE4] bg-[#F8F9FB] px-5 py-3.5">
+                  <Link
+                    href={`/topics/${topic.slug}`}
+                    style={{ backgroundColor: theme.buttonBg }}
+                    className="inline-flex flex-1 items-center justify-center gap-1.5 rounded-[10px] border-[1.5px] border-[#161A22] px-3 py-2 text-xs font-bold text-white shadow-xs ui-transition hover:opacity-90"
                   >
-                    {QUESTION_TYPE_LABELS[qt]}
-                  </span>
-                ))}
-                <span className="rounded bg-[#EAF1FA] px-2 py-0.5 font-code text-xs font-medium text-[#1E4E8C] tabular-nums">
-                  {topic.question_count} 題
-                </span>
-                {topic.student_correct !== undefined && (
-                  <span className="rounded bg-[#EAF6EF] px-2 py-0.5 font-code text-xs font-medium text-[#157F4B] tabular-nums">
-                    已通過 {topic.student_correct}/{topic.question_count}
-                  </span>
-                )}
-              </div>
-
-              <div className="lg:col-span-3 flex flex-wrap items-center justify-start lg:justify-end gap-2">
-                <Link
-                  href={`/topics/${topic.slug}`}
-                  className="inline-flex items-center gap-1.5 rounded-md bg-[#1E4E8C] px-3 py-1.5 text-xs font-medium text-white ui-transition hover:bg-[#163C6E]"
-                >
-                  <BookOpen className="h-3.5 w-3.5" strokeWidth={1.75} />
-                  <span>進入教學頁</span>
-                </Link>
-                <Link
-                  href={`/practice?topic=${topic.slug}`}
-                  className="inline-flex items-center gap-1 rounded-md border border-[#E2E0D8] bg-white px-3 py-1.5 text-xs font-medium text-[#17191C] ui-transition hover:bg-[#F0EFEA]"
-                >
-                  <span>刷題</span>
-                </Link>
-              </div>
-            </div>
-          ))}
+                    <Cpu className="h-3.5 w-3.5" strokeWidth={2} />
+                    <span>開啟實驗室</span>
+                  </Link>
+                  <Link
+                    href={`/practice?topic=${topic.slug}`}
+                    className="synth-pad inline-flex items-center justify-center gap-1 px-3.5 py-2 text-xs font-bold"
+                  >
+                    <span>直接刷題</span>
+                    <ArrowRight className="h-3.5 w-3.5" strokeWidth={2} />
+                  </Link>
+                </div>
+              </article>
+            );
+          })}
         </div>
       </section>
 
-      {/* Six Cognitive Question Types */}
+      {/* Six Trigger Pads: Question Type Drills */}
       <section className="space-y-4">
-        <div className="border-b border-[#E2E0D8] pb-3">
-          <h2 className="text-xl font-bold text-[#17191C]">六大認知題型特訓入口</h2>
-          <p className="mt-1 text-sm text-[#525866]">
-            純算輸出只佔 APCS 識讀的 33%，針對「逆向填空、找反例測資、死碼推理」分項特訓更能快速拉高分數
+        <div>
+          <h2 className="text-2xl font-black text-[#11151C]">六大考法專攻發射墊</h2>
+          <p className="mt-1 text-sm text-[#4B5565]">
+            APCS 不只問執行結果，還會考「填補條件、找 BUG、舉反例、抓死碼」— 點一個發射墊立即專練
           </p>
         </div>
 
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
           {allTypes.map((qt) => (
             <Link
               key={qt}
               href={`/practice?type=${qt}`}
-              className="group flex flex-col justify-between rounded-lg border border-[#E2E0D8] bg-white p-4 ui-transition hover:border-[#1E4E8C]"
+              className="synth-pad group flex flex-col justify-between p-4"
             >
               <div>
-                <div className="mb-1.5 flex items-center justify-between">
-                  <span className="text-sm font-semibold text-[#17191C] group-hover:text-[#1E4E8C]">
-                    {QUESTION_TYPE_LABELS[qt]}
+                <div className="mb-2 flex items-center justify-between">
+                  <span className="rounded bg-[#161A22] px-2 py-0.5 font-display text-[11px] font-bold text-white">
+                    {QUESTION_TYPE_PAD_CODES[qt]}
                   </span>
-                  <Layers className="h-4 w-4 text-[#6C7382] group-hover:text-[#1E4E8C]" strokeWidth={1.75} />
+                  <Zap
+                    className="h-3.5 w-3.5 text-[#647082] group-hover:text-[#FF4F17] ui-transition"
+                    strokeWidth={2.2}
+                  />
                 </div>
-                <p className="text-xs leading-relaxed text-[#525866]">
+                <h3 className="text-sm font-black text-[#11151C] group-hover:text-[#D93B09]">
+                  {QUESTION_TYPE_LABELS[qt]}
+                </h3>
+                <p className="mt-1.5 text-xs leading-relaxed text-[#4B5565]">
                   {QUESTION_TYPE_DESCRIPTIONS[qt]}
                 </p>
               </div>
-              <div className="mt-3 flex items-center gap-1 text-xs font-medium text-[#1E4E8C]">
-                <span>練習此題型</span>
-                <ArrowRight className="h-3.5 w-3.5" strokeWidth={1.75} />
+              <div className="mt-3 flex items-center gap-1 font-code text-[11px] font-bold text-[#D93B09]">
+                <span>START</span>
+                <ArrowRight className="h-3 w-3" strokeWidth={2.2} />
               </div>
             </Link>
           ))}
         </div>
       </section>
 
-      {/* Dual Role Split Note */}
-      <section className="rounded-lg border border-[#E2E0D8] bg-white p-6">
-        <div className="grid gap-6 md:grid-cols-2 md:divide-x md:divide-[#E2E0D8]">
-          <div className="space-y-2 md:pr-6">
-            <h3 className="text-base font-semibold text-[#1E4E8C]">給學生與自學者</h3>
-            <p className="text-sm leading-relaxed text-[#525866]">
-              註冊學生帳號並輸入老師的 6 碼班級代碼（如 <code className="font-code">APCS2A</code>），即可接收班級作業、追蹤五大主題與六大題型掌握度，並從錯題清單直接重播執行軌跡。
+      {/* Dual Role Console Strip */}
+      <section className="grid gap-4 md:grid-cols-2">
+        <div className="synth-panel-hard overflow-hidden">
+          <div className="h-1.5 w-full bg-[#FF4F17]" />
+          <div className="p-5 sm:p-6 space-y-2.5">
+            <h3 className="text-base font-black text-[#11151C]">
+              學生自主練習與班級同步
+            </h3>
+            <p className="text-sm leading-relaxed text-[#4B5565]">
+              登入或註冊帳號並輸入老師的 6 碼班級代碼（如{" "}
+              <code className="rounded bg-[#FFF1EC] px-1.5 py-0.5 font-code text-xs font-bold text-[#B83006]">
+                APCS2A
+              </code>
+              ），就能在所有關卡方格點亮綠燈破關印記，並將錯題一鍵送回追蹤器重播。
             </p>
           </div>
-          <div className="space-y-2 md:pl-6">
-            <h3 className="text-base font-semibold text-[#0F6B5E]">給資訊科教師與培訓講師</h3>
-            <p className="text-sm leading-relaxed text-[#525866]">
-              登入教師管理後台即可建立班級、檢視「主題 × 題型」班級弱點熱度矩陣與高錯率迷思排行、自訂班級專屬題目、編修主題教學內容與指派作業任務。
+        </div>
+
+        <div className="synth-panel-hard overflow-hidden">
+          <div className="h-1.5 w-full bg-[#007A5B]" />
+          <div className="p-5 sm:p-6 space-y-2.5">
+            <h3 className="text-base font-black text-[#11151C]">
+              教師班級管理與弱點熱度矩陣
+            </h3>
+            <p className="text-sm leading-relaxed text-[#4B5565]">
+              資訊科教師登入後可直接開立班級、編修五大主題講義、建立班級專屬題目與指派練習作業，即時從「主題 × 考法」熱度矩陣找出全班盲點。
             </p>
           </div>
         </div>

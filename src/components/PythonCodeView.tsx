@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Check, Copy } from "lucide-react";
+import { AlertTriangle, Check, Copy, Play } from "lucide-react";
 
 interface PythonCodeViewProps {
   code: string;
@@ -42,14 +42,16 @@ function tokenizeLine(line: string): Array<{ text: string; cls: string }> {
 
     // Comment
     if (ch === "#") {
-      tokens.push({ text: line.slice(i), cls: "text-[#7F8CA3] italic" });
+      tokens.push({ text: line.slice(i), cls: "text-[#7A8AA3] italic" });
       break;
     }
 
     // String literal ('...' or "..." or f'...')
     if (
-      (ch === "'" || ch === '"') ||
-      ((ch === "f" || ch === "F") && (line[i + 1] === "'" || line[i + 1] === '"'))
+      ch === "'" ||
+      ch === '"' ||
+      ((ch === "f" || ch === "F") &&
+        (line[i + 1] === "'" || line[i + 1] === '"'))
     ) {
       const start = i;
       if (ch === "f" || ch === "F") i += 1;
@@ -60,12 +62,16 @@ function tokenizeLine(line: string): Array<{ text: string; cls: string }> {
         i += 1;
       }
       if (i < line.length) i += 1;
-      tokens.push({ text: line.slice(start, i), cls: "text-[#9ECE6A]" });
+      tokens.push({ text: line.slice(start, i), cls: "text-[#4ADE80]" });
       continue;
     }
 
     // Blank placeholder (?) or ____ or <condition>
-    if (line.startsWith("(?)", i) || line.startsWith("<condition>", i) || line.startsWith("____", i)) {
+    if (
+      line.startsWith("(?)", i) ||
+      line.startsWith("<condition>", i) ||
+      line.startsWith("____", i)
+    ) {
       const len = line.startsWith("(?)", i)
         ? 3
         : line.startsWith("<condition>", i)
@@ -73,7 +79,7 @@ function tokenizeLine(line: string): Array<{ text: string; cls: string }> {
         : 4;
       tokens.push({
         text: line.slice(i, i + len),
-        cls: "rounded bg-[#B4690E]/30 px-1 text-[#F6C177] font-semibold",
+        cls: "rounded bg-[#FF4F17]/25 px-1 text-[#FFB800] font-semibold",
       });
       i += len;
       continue;
@@ -85,11 +91,11 @@ function tokenizeLine(line: string): Array<{ text: string; cls: string }> {
       while (i < line.length && /[a-zA-Z0-9_]/.test(line[i])) i += 1;
       const word = line.slice(start, i);
       if (KEYWORDS.has(word)) {
-        tokens.push({ text: word, cls: "text-[#BB9AF7] font-medium" });
+        tokens.push({ text: word, cls: "text-[#C084FC] font-medium" });
       } else if (BUILTINS.has(word)) {
-        tokens.push({ text: word, cls: "text-[#7DCFFF]" });
+        tokens.push({ text: word, cls: "text-[#38BDF8]" });
       } else {
-        tokens.push({ text: word, cls: "text-[#E4E9F2]" });
+        tokens.push({ text: word, cls: "text-[#EEF2F8]" });
       }
       continue;
     }
@@ -98,12 +104,12 @@ function tokenizeLine(line: string): Array<{ text: string; cls: string }> {
     if (/[0-9]/.test(ch)) {
       const start = i;
       while (i < line.length && /[0-9.]/.test(line[i])) i += 1;
-      tokens.push({ text: line.slice(start, i), cls: "text-[#FF9E64]" });
+      tokens.push({ text: line.slice(start, i), cls: "text-[#FB923C]" });
       continue;
     }
 
     // Operators / punctuation
-    tokens.push({ text: ch, cls: "text-[#9AA5CE]" });
+    tokens.push({ text: ch, cls: "text-[#94A3B8]" });
     i += 1;
   }
 
@@ -132,29 +138,38 @@ export function PythonCodeView({
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-[#252C3A] bg-[#141820] text-[#E4E9F2]">
-      <div className="flex items-center justify-between border-b border-[#252C3A] bg-[#1B202B] px-3.5 py-2">
-        <span className="font-code text-xs text-[#9AA5CE]">
-          {caption ?? "Python 3"}
-        </span>
+    <div className="synth-oled overflow-hidden">
+      <div className="flex items-center justify-between border-b border-[#262F3F] bg-[#161B24] px-3.5 py-2">
+        <div className="flex items-center gap-2.5 min-w-0">
+          <div className="flex items-center gap-1.5 shrink-0" aria-hidden="true">
+            <span className="h-2 w-2 rounded-full bg-[#FF4F17]" />
+            <span className="h-2 w-2 rounded-full bg-[#FFB800]" />
+            <span className="h-2 w-2 rounded-full bg-[#00C48C]" />
+          </div>
+          <span className="truncate font-code text-xs font-medium text-[#A8B6CC]">
+            {caption ?? "PYTHON 3 // OLED TRACE"}
+          </span>
+        </div>
+
         <button
           type="button"
           onClick={handleCopy}
-          className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-xs text-[#9AA5CE] ui-transition hover:bg-[#252C3A] hover:text-white"
+          className="inline-flex shrink-0 items-center gap-1 rounded-md border border-[#2B3548] bg-[#1E2533] px-2.5 py-1 text-[11px] font-medium text-[#CBD5E1] ui-transition hover:border-[#4B5872] hover:text-white"
         >
           {copied ? (
             <>
-              <Check className="h-3.5 w-3.5 text-[#73DACA]" strokeWidth={1.75} />
-              <span>已複製</span>
+              <Check className="h-3 w-3 text-[#00C48C]" strokeWidth={2.2} />
+              <span className="text-[#00C48C]">已複製</span>
             </>
           ) : (
             <>
-              <Copy className="h-3.5 w-3.5" strokeWidth={1.75} />
+              <Copy className="h-3 w-3" strokeWidth={2} />
               <span>複製</span>
             </>
           )}
         </button>
       </div>
+
       <div className={`overflow-x-auto ${compact ? "py-2" : "py-3"}`}>
         <table className="w-full border-collapse font-code text-[13px] leading-6">
           <tbody>
@@ -164,27 +179,58 @@ export function PythonCodeView({
               const isBug = bugLines.includes(lineNum);
               const isDead = deadLines.includes(lineNum);
 
-              let rowBg = "";
-              if (isActive) rowBg = "bg-[#1E4E8C]/35";
-              else if (isBug) rowBg = "bg-[#C23535]/25";
+              let rowCls = "ui-transition";
+              if (isActive) {
+                rowCls =
+                  "ui-transition bg-[#FF4F17]/20 ring-1 ring-inset ring-[#FF4F17]/45";
+              } else if (isBug) {
+                rowCls =
+                  "ui-transition bg-[#FF4757]/18 ring-1 ring-inset ring-[#FF4757]/40";
+              }
 
               const tokens = tokenizeLine(line);
 
               return (
-                <tr key={lineNum} className={`${rowBg} ui-transition`}>
-                  <td className="w-10 select-none pr-3 text-right text-xs text-[#647087] tabular-nums align-top">
-                    {lineNum}
+                <tr key={lineNum} className={rowCls}>
+                  <td className="w-12 select-none pr-3 pl-2.5 text-right text-xs tabular-nums align-top">
+                    <span className="inline-flex items-center justify-end gap-1">
+                      {isActive && (
+                        <Play
+                          className="h-2.5 w-2.5 fill-[#FF4F17] text-[#FF4F17]"
+                          strokeWidth={2}
+                        />
+                      )}
+                      {!isActive && isBug && (
+                        <AlertTriangle
+                          className="h-3 w-3 text-[#FF4757]"
+                          strokeWidth={2}
+                        />
+                      )}
+                      <span
+                        className={
+                          isActive
+                            ? "font-bold text-[#FF8A65]"
+                            : isBug
+                            ? "font-bold text-[#FF6B7B]"
+                            : "text-[#69778F]"
+                        }
+                      >
+                        {lineNum}
+                      </span>
+                    </span>
                   </td>
                   <td
                     className={`pr-4 whitespace-pre ${
-                      isDead ? "opacity-50 line-through decoration-[#647087]" : ""
+                      isDead ? "opacity-50 line-through decoration-[#7A8AA3]" : ""
                     }`}
                   >
-                    {tokens.length === 0 ? " " : tokens.map((t, tIdx) => (
-                      <span key={tIdx} className={t.cls}>
-                        {t.text}
-                      </span>
-                    ))}
+                    {tokens.length === 0
+                      ? " "
+                      : tokens.map((t, tIdx) => (
+                          <span key={tIdx} className={t.cls}>
+                            {t.text}
+                          </span>
+                        ))}
                   </td>
                 </tr>
               );
