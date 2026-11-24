@@ -184,7 +184,7 @@ export function TopNav({ initialUser }: TopNavProps) {
             )}
 
             <div className="font-code text-[10px] text-[#7E91B8] tabular-nums tracking-wider">
-              5 LINES · 30 STATIONS
+              5 LINES · 50 STATIONS
             </div>
           </div>
         </div>

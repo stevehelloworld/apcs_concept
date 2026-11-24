@@ -6,7 +6,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "APCS RAIL — Python 程式識讀路網",
   description:
-    "2025 APCS Python 0915 30 題互動路網、單步執行追蹤與教師班級後台。",
+    "APCS Python 程式識讀 50 題（官方 0915 ＋ 原創模擬）互動路網、觀念實驗卡、單步追蹤與教師班級後台。",
 };
 
 export default async function RootLayout({
