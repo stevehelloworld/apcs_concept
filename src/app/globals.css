@@ -1,6 +1,10 @@
 @import "tailwindcss";
 
 :root {
+  --font-noto-sans-tc: "Noto Sans TC";
+  --font-jetbrains-mono: "JetBrains Mono";
+  --font-display: "Chakra Petch";
+
   --chassis-bg: #E6E9EE;
   --panel-bg: #F8F9FB;
   --panel-white: #FFFFFF;
