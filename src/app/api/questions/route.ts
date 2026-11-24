@@ -15,6 +15,7 @@ export async function GET(req: Request) {
     topicSlug: searchParams.get("topic") ?? undefined,
     questionType: searchParams.get("type") ?? undefined,
     difficulty: searchParams.get("difficulty") ?? undefined,
+    source: searchParams.get("source") ?? undefined,
     assignmentId: assignmentParam ? Number(assignmentParam) : undefined,
     status: searchParams.get("status") ?? undefined,
     limit: limitParam ? Number(limitParam) : undefined,

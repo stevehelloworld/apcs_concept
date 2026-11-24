@@ -1,204 +1,146 @@
 {
   "schemaVersion": 2,
-  "generatedAt": "2026-11-24T11:16:00+08:00",
-  "title": "Design System: OP-APCS 識讀實驗室",
+  "generatedAt": "2026-11-24T19:47:00+08:00",
+  "title": "Design System: APCS RAIL 程式識讀路網",
   "extensions": {
     "colorMeta": {
-      "signal-orange-action": {
-        "role": "primary",
-        "displayName": "Signal Orange Action",
-        "canonical": "oklch(58% 0.21 34)",
-        "tonalRamp": ["#2D0A02", "#591604", "#8A2406", "#BA3005", "#D93B09", "#FF5C2B", "#FF9C7D", "#FFF1EC"]
-      },
-      "signal-orange-led": {
-        "role": "primary",
-        "displayName": "Signal Orange LED",
-        "canonical": "oklch(64% 0.22 33)",
-        "tonalRamp": ["#330D02", "#661B05", "#992A08", "#CC3B0F", "#FF4F17", "#FF784D", "#FFB096", "#FFF2ED"]
-      },
-      "teacher-emerald": {
-        "role": "secondary",
-        "displayName": "Studio Emerald",
-        "canonical": "oklch(50% 0.12 162)",
-        "tonalRamp": ["#002219", "#003D2D", "#005942", "#007A5B", "#009E77", "#1CC297", "#7EE4C8", "#E6F7F2"]
-      },
-      "mod-cobalt": {
-        "role": "secondary",
-        "displayName": "Module 02 Cobalt",
-        "canonical": "oklch(48% 0.21 262)",
-        "tonalRamp": ["#0B1A4A", "#132D7D", "#193CB0", "#1D4ED8", "#3B72F6", "#769DF9", "#B8CEFD", "#EDF3FF"]
-      },
-      "mod-mint": {
-        "role": "tertiary",
-        "displayName": "Module 03 Mint",
-        "canonical": "oklch(50% 0.13 160)",
-        "tonalRamp": ["#002117", "#003C2A", "#00583F", "#007A57", "#00A878", "#36CB9E", "#8AE8CB", "#E6FAF3"]
-      },
-      "mod-violet": {
-        "role": "tertiary",
-        "displayName": "Module 04 Violet",
-        "canonical": "oklch(47% 0.23 288)",
-        "tonalRamp": ["#200B4A", "#37137D", "#501CAE", "#6D28D9", "#8B4BF0", "#B082F6", "#D6BDFC", "#F4EEFF"]
-      },
-      "mod-amber": {
-        "role": "tertiary",
-        "displayName": "Module 05 Amber",
-        "canonical": "oklch(52% 0.14 68)",
-        "tonalRamp": ["#2E1700", "#542D00", "#7A4300", "#9A5800", "#D98200", "#F5A623", "#FAD07A", "#FFF6E0"]
-      },
-      "chassis-aluminum": {
+      "enamel-ground": {
         "role": "neutral",
-        "displayName": "Chassis Aluminum",
-        "canonical": "oklch(93% 0.006 250)",
-        "tonalRamp": ["#2B303A", "#565E6E", "#848E9F", "#AEB7C4", "#C8CFD9", "#DDE2EA", "#E6E9EE", "#F8F9FB"]
+        "displayName": "Midnight Enamel Ground",
+        "canonical": "oklch(17% 0.06 266)",
+        "tonalRamp": ["#040817", "#070C22", "#09102D", "#0B1230", "#111B45", "#132055", "#172459", "#273873"]
       },
-      "bezel-obsidian": {
+      "porcelain-white": {
         "role": "neutral",
-        "displayName": "Obsidian Bezel",
-        "canonical": "oklch(21% 0.018 258)",
-        "tonalRamp": ["#090B0F", "#0D1117", "#161A22", "#262F3F", "#3D4759", "#647082", "#9AA3B2", "#DDE2EA"]
+        "displayName": "Porcelain Ink",
+        "canonical": "oklch(100% 0 0)",
+        "tonalRamp": ["#3B529E", "#7E91B8", "#9FB0D1", "#B8C5E0", "#D6E0F2", "#EBF0FA", "#F5F7FC", "#FFFFFF"]
+      },
+      "line-scarlet": {
+        "role": "primary",
+        "displayName": "L1 Scarlet Ink",
+        "canonical": "oklch(55% 0.22 25)",
+        "tonalRamp": ["#38060A", "#6B0C14", "#99111D", "#C51624", "#E21D2D", "#F04E5B", "#FF7A85", "#FFD6DA"]
+      },
+      "line-cobalt": {
+        "role": "secondary",
+        "displayName": "L2 Cobalt Ink",
+        "canonical": "oklch(52% 0.24 264)",
+        "tonalRamp": ["#061442", "#0D2780", "#1646CC", "#1E5BFF", "#4778FF", "#7AA4FF", "#AFC8FF", "#E5EEFF"]
+      },
+      "line-green": {
+        "role": "secondary",
+        "displayName": "L3 Signal Green & Teacher Control",
+        "canonical": "oklch(58% 0.16 149)",
+        "tonalRamp": ["#062B12", "#0C4F21", "#127230", "#168A3B", "#22B14C", "#4ADE80", "#86EFAC", "#DCFCE7"]
+      },
+      "line-amber": {
+        "role": "tertiary",
+        "displayName": "L4 Amber Ink",
+        "canonical": "oklch(83% 0.17 85)",
+        "tonalRamp": ["#3D2D00", "#735600", "#A87E00", "#E0AA00", "#FFC20E", "#FFD452", "#FFE48F", "#FFF5D6"]
+      },
+      "line-cyan": {
+        "role": "tertiary",
+        "displayName": "L5 Cyan Ink",
+        "canonical": "oklch(72% 0.12 198)",
+        "tonalRamp": ["#052E32", "#09575E", "#0E9AA5", "#14B8C4", "#34D0DC", "#5EEAD4", "#99F6E4", "#E6FFFA"]
       }
     },
     "typographyMeta": {
-      "display": { "displayName": "Chakra Petch Display", "purpose": "Hardware model tags, module numbers, pad codes, and OLED readout metrics." },
-      "headline": { "displayName": "Noto Sans TC Black", "purpose": "Primary Traditional Chinese page and module headings." },
-      "title": { "displayName": "Noto Sans TC Bold", "purpose": "Card titles, question headers, and sub-section headings." },
-      "body": { "displayName": "Noto Sans TC Regular", "purpose": "Prompt descriptions, summaries, and explanations (<=65ch measure)." },
-      "label": { "displayName": "JetBrains Mono", "purpose": "Line numbers, official question refs, variable registers, and Python source." }
-    },
-    "shadows": [
-      {
-        "name": "machined-panel",
-        "value": "0 4px 10px -3px rgba(17, 21, 28, 0.08), inset 0 -2px 0 rgba(196, 203, 214, 0.55)",
-        "purpose": "Secondary module faceplates and navigation rails."
+      "display": {
+        "displayName": "Barlow Condensed",
+        "purpose": "Condensed route codes (L1..L5, T1..T6), concourse headings, and tabular telemetry figures."
       },
-      {
-        "name": "active-casing",
-        "value": "0 6px 16px -4px rgba(17, 21, 28, 0.14), inset 0 -3px 0 rgba(22, 26, 34, 0.14)",
-        "purpose": "Primary active practice cards, step tracer deck, and rack modules."
+      "title": {
+        "displayName": "Noto Sans TC Black",
+        "purpose": "Concise Traditional Chinese page and station module titles."
       },
-      {
-        "name": "oled-recess",
-        "value": "inset 0 2px 12px rgba(0, 0, 0, 0.65), 0 3px 10px -3px rgba(13, 17, 23, 0.25)",
-        "purpose": "Recessed Python OLED screens and terminal output bays."
+      "body": {
+        "displayName": "Noto Sans TC Regular",
+        "purpose": "Question prompts, concept mental-model pills, and concise explanations."
+      },
+      "label": {
+        "displayName": "JetBrains Mono",
+        "purpose": "Station refs (0915-Q1..30, SIM-01..20), Python syntax view, and tabular counters."
       }
-    ],
+    },
+    "shadows": [],
     "motion": [
       {
-        "name": "keycap-press",
-        "value": "120ms cubic-bezier(0.2, 0.8, 0.2, 1)",
-        "purpose": "Tactile lift on hover and 1.5px press depression on keycap controls."
-      },
-      {
         "name": "surface-transition",
-        "value": "160ms cubic-bezier(0.2, 0.8, 0.2, 1)",
-        "purpose": "Border, background, and opacity transitions across instrument pads."
+        "value": "150ms cubic-bezier(0.2, 0.8, 0.2, 1)",
+        "purpose": "Subtle hairline border, background tint, and active line highlight transitions."
       }
     ],
     "breakpoints": [
       { "name": "sm", "value": "640px" },
       { "name": "md", "value": "768px" },
       { "name": "lg", "value": "1024px" },
-      { "name": "xl", "value": "1280px" }
+      { "name": "xl", "value": "1320px" }
     ]
   },
   "components": [
     {
-      "name": "Primary Orange Keycap",
+      "name": "Primary Scarlet Transit Button",
       "kind": "button",
-      "refersTo": "button-orange",
-      "description": "Student primary action button for entering modules, submitting answers, and toggling auto-play.",
-      "html": "<button class=\"ds-pad-orange\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polygon points=\"6 3 20 12 6 21 6 3\"></polygon></svg><span>打開五大模組地圖</span></button>",
-      "css": ".ds-pad-orange { display: inline-flex; align-items: center; gap: 8px; background: var(--signal-orange-btn, #D93B09); color: #FFFFFF; border: 1.5px solid #161A22; border-radius: 10px; padding: 10px 18px; font-weight: 700; font-size: 13px; cursor: pointer; box-shadow: 0 4px 8px -2px rgba(217, 59, 9, 0.34), inset 0 -2.5px 0 rgba(17, 21, 28, 0.25); transition: transform 120ms ease, background-color 140ms ease, box-shadow 120ms ease; } .ds-pad-orange:hover { background: #BA3005; transform: translateY(-1px); } .ds-pad-orange:active { transform: translateY(1.5px); } .ds-pad-orange:focus-visible { outline: 2.5px solid #D93B09; outline-offset: 2px; }"
+      "refersTo": "button-primary",
+      "description": "Primary student action button in Scarlet #E21D2D with crisp 5px corner radius.",
+      "html": "<button class=\"rail-btn-primary\">開始刷題 →</button>",
+      "css": ".rail-btn-primary { display: inline-flex; align-items: center; gap: 6px; background: #E21D2D; color: #FFFFFF; border: 1px solid rgba(255,255,255,0.25); border-radius: 5px; padding: 8px 16px; font-weight: 700; font-size: 12px; }"
     },
     {
-      "name": "Secondary Hardware Keycap",
+      "name": "Teacher Signal Green Button",
       "kind": "button",
-      "refersTo": "button-pad",
-      "description": "Crisp white keycap button for secondary actions, transport steps, and practice triggers.",
-      "html": "<button class=\"ds-pad\"><span>進入刷題實驗台</span></button>",
-      "css": ".ds-pad { display: inline-flex; align-items: center; gap: 8px; background: #FFFFFF; color: #11151C; border: 1.5px solid #161A22; border-radius: 10px; padding: 10px 16px; font-weight: 700; font-size: 13px; cursor: pointer; box-shadow: 0 3px 6px -2px rgba(17, 21, 28, 0.18), inset 0 -2px 0 rgba(22, 26, 34, 0.14); transition: transform 120ms ease, background-color 140ms ease; } .ds-pad:hover { background: #F3F5F8; transform: translateY(-1px); } .ds-pad:active { transform: translateY(1.5px); } .ds-pad:focus-visible { outline: 2.5px solid #D93B09; outline-offset: 2px; }"
+      "refersTo": "button-teacher",
+      "description": "Primary teacher action button in Signal Green #168A3B with WCAG AA contrast.",
+      "html": "<button class=\"rail-btn-green\">新增學生帳號</button>",
+      "css": ".rail-btn-green { display: inline-flex; align-items: center; gap: 6px; background: #168A3B; color: #FFFFFF; border: 1px solid rgba(255,255,255,0.25); border-radius: 5px; padding: 8px 16px; font-weight: 700; font-size: 12px; }"
     },
     {
-      "name": "Teacher Emerald Keycap",
+      "name": "Porcelain Outline Button",
       "kind": "button",
-      "refersTo": "button-emerald",
-      "description": "Teacher master console action button for saving topics, questions, and creating classes.",
-      "html": "<button class=\"ds-pad-emerald\"><span>新增班級</span></button>",
-      "css": ".ds-pad-emerald { display: inline-flex; align-items: center; gap: 6px; background: #007A5B; color: #FFFFFF; border: 1.5px solid #161A22; border-radius: 10px; padding: 10px 18px; font-weight: 700; font-size: 13px; cursor: pointer; box-shadow: 0 4px 8px -2px rgba(0, 122, 91, 0.3), inset 0 -2.5px 0 rgba(17, 21, 28, 0.25); transition: transform 120ms ease, background-color 140ms ease; } .ds-pad-emerald:hover { background: #006148; transform: translateY(-1px); } .ds-pad-emerald:active { transform: translateY(1.5px); } .ds-pad-emerald:focus-visible { outline: 2.5px solid #007A5B; outline-offset: 2px; }"
+      "refersTo": "button-secondary",
+      "description": "Secondary transit button on deep enamel well #070C22 with 1px porcelain hairline.",
+      "html": "<button class=\"rail-btn\">路線總覽 →</button>",
+      "css": ".rail-btn { display: inline-flex; align-items: center; gap: 6px; background: rgba(7,12,34,0.7); color: #FFFFFF; border: 1px solid rgba(255,255,255,0.36); border-radius: 5px; padding: 8px 16px; font-weight: 700; font-size: 12px; }"
     },
     {
-      "name": "Recessed OLED Code Monitor",
-      "kind": "custom",
-      "refersTo": "oled-monitor",
-      "description": "High-contrast recessed dark screen displaying syntax-highlighted Python lines with active trace bar.",
-      "html": "<div class=\"ds-oled\"><div class=\"ds-oled-head\"><span class=\"ds-dots\"><i class=\"ds-dot-o\"></i><i class=\"ds-dot-a\"></i><i class=\"ds-dot-g\"></i></span><span>APCS 0915-Q8 // OLED TRACE</span></div><div class=\"ds-oled-body\"><div class=\"ds-line ds-line-active\"><span class=\"ds-ln\">5</span><span>print(m)</span></div><div class=\"ds-line\"><span class=\"ds-ln\">6</span><span>f2(m + 2)</span></div></div></div>",
-      "css": ".ds-oled { background: #0D1117; border: 2px solid #1E2533; border-radius: 14px; overflow: hidden; color: #EEF2F8; font-family: monospace; font-size: 13px; box-shadow: inset 0 2px 12px rgba(0,0,0,0.65); } .ds-oled-head { display: flex; align-items: center; gap: 10px; background: #161B24; border-bottom: 1px solid #262F3F; padding: 8px 14px; color: #A8B6CC; font-size: 12px; } .ds-dots { display: inline-flex; gap: 5px; } .ds-dots i { display: block; width: 8px; height: 8px; border-radius: 9999px; } .ds-dot-o { background: #FF4F17; } .ds-dot-a { background: #FFB800; } .ds-dot-g { background: #00C48C; } .ds-oled-body { padding: 8px 0; } .ds-line { display: flex; gap: 12px; padding: 3px 14px; } .ds-line-active { background: rgba(255, 79, 23, 0.22); box-shadow: inset 0 0 0 1px rgba(255, 79, 23, 0.45); color: #FFFFFF; } .ds-ln { color: #69778F; width: 20px; text-align: right; }"
-    },
-    {
-      "name": "Sequencer Question Pad",
+      "name": "Concourse Hairline Frame",
       "kind": "card",
-      "refersTo": "module-card",
-      "description": "Compact pressable challenge pad inside topic matrices showing official ref, status LED, title, and type.",
-      "html": "<a class=\"ds-seq-pad\" href=\"#\"><div class=\"ds-seq-top\"><span class=\"ds-ref\">0915-Q10</span><span class=\"ds-led-ok\" title=\"已破關\"></span></div><div class=\"ds-seq-title\">巢狀縮排與 0 的 Falsy 判斷</div><div class=\"ds-seq-foot\">執行追蹤 →</div></a>",
-      "css": ".ds-seq-pad { display: flex; flex-direction: column; justify-content: space-between; gap: 10px; background: #FFFFFF; border: 1.5px solid #161A22; border-radius: 10px; padding: 14px; text-decoration: none; color: #11151C; box-shadow: 0 3px 6px -2px rgba(17,21,28,0.18), inset 0 -2px 0 rgba(22,26,34,0.14); transition: transform 120ms ease, background-color 140ms ease; } .ds-seq-pad:hover { background: #F3F5F8; transform: translateY(-1px); } .ds-seq-top { display: flex; justify-content: space-between; align-items: center; } .ds-ref { background: #161A22; color: #FFFFFF; padding: 2px 8px; border-radius: 5px; font-family: monospace; font-size: 11px; font-weight: 700; } .ds-led-ok { width: 10px; height: 10px; border-radius: 9999px; background: #00C48C; } .ds-seq-title { font-weight: 700; font-size: 13px; line-height: 1.35; } .ds-seq-foot { font-size: 11px; color: #4B5565; font-weight: 600; }"
-    },
-    {
-      "name": "Segmented Instrument Rail",
-      "kind": "nav",
-      "refersTo": "button-pad",
-      "description": "Recessed switch housing holding latched obsidian active tabs with colored channel indicator LEDs.",
-      "html": "<div class=\"ds-rail\"><a class=\"ds-tab ds-tab-active\" href=\"#\"><i class=\"ds-led-o\"></i><span>探索模組</span></a><a class=\"ds-tab\" href=\"#\"><i class=\"ds-led-off\"></i><span>刷題實驗台</span></a></div>",
-      "css": ".ds-rail { display: inline-flex; gap: 4px; background: #DDE2EA; border: 1.5px solid #C4CBD6; border-radius: 12px; padding: 4px; } .ds-tab { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; color: #4B5565; text-decoration: none; } .ds-tab:hover { background: rgba(255,255,255,0.75); color: #11151C; } .ds-tab-active { background: #161A22; color: #FFFFFF; } .ds-tab i { width: 6px; height: 6px; border-radius: 9999px; display: block; } .ds-led-o { background: #FF4F17; } .ds-led-off { background: #9AA3B2; }"
+      "refersTo": "concourse-frame",
+      "description": "Midnight enamel frame bounded by a clean 1px porcelain hairline with zero drop shadow.",
+      "html": "<section class=\"rail-frame\">APCS RAIL Concourse</section>",
+      "css": ".rail-frame { background: rgba(11,18,48,0.86); border: 1px solid rgba(255,255,255,0.22); border-radius: 6px; color: #FFFFFF; padding: 16px; }"
     }
   ],
   "narrative": {
-    "northStar": "The Modular Trace Synthesizer",
-    "overview": "OP-APCS 識讀實驗室專為國高中生與資訊科教師設計，將 Python 程式識讀與 2025 APCS 0915 全 30 題轉化為一台高對比的實體模組合成器工作台。全站拋棄傳統灰白試卷表格感，採用在白天教室投影機與筆電螢幕上依然清晰銳利的霧銀陽極鋁機殼網格底，讓程式碼追蹤器、五大知識模組與 30 個序列化關卡方塊具備立體儀器按壓手感與即時視覺回饋。\n\n系統明確區分「學生實戰端」與「教師主控台」兩種場域能量，同時維持同一套機殼結構與鍵帽語彙：學生以訊號橘與五大模組通道色彩進行單步除錯與破關亮燈；教師則以深翡翠綠主控介面管理班級、指派作業與檢視熱度矩陣。",
+    "northStar": "Midnight-Blue Enamel Transit Diagram",
+    "overview": "APCS RAIL 將 2025 APCS Python 0915 範例與原創模擬題轉化為午夜深藍琺瑯底板（#0B1230）上的互動捷運路網圖與調度時刻表，大幅減少冗長敘述文字，讓 45°/90° 路線軌跡、可點擊車站與程式碼執行窗口成為核心焦點。",
     "keyCharacteristics": [
-      "霧銀陽極鋁打點底紋搭配外露 2px 深墨色儀器邊框，構築不顯幼稚卻充滿好奇心的青少年操作環境。",
-      "程式碼與執行狀態集中於凹槽式純黑高對比 OLED 螢幕內呈現，執行中行號以橘紅邊框與播放指標高亮標示。",
-      "五大主題各自擁有高飽和識別色彩與 MOD-01 至 MOD-05 模組編號，六大考法對應 PAD-A 至 PAD-F 觸發墊。",
-      "任何狀態更新（步驟推桿、滑動測資條、題庫過關綠燈）皆以明確色點 LED 與數值暫存器即時呈現。"
+      "45° 與 90° 幾何五色路線（L1–L5）交會於 CENTRAL 轉乘點。",
+      "1px 瓷白細線時刻表框架搭配深藍內凹程式碼井（#070C22），零誇張浮動陰影。",
+      "桌面左側垂直軌道導覽＋手機固定底部 4 鍵分頁列，教師端改採頂部號誌綠水平調度分頁。"
     ],
     "rules": [
       {
-        "name": "The Button Contrast Rule",
-        "section": "colors",
-        "body": "凡帶有白色文字（#FFFFFF）的操作按鈕與鍵帽，一律採用加深飽和版色碼（訊號橘按鈕使用 #D93B09、翡翠綠按鈕使用 #007A5B、模組按鈕使用各通道 buttonBg），嚴禁將亮色 LED 專用的 #FF4F17 或 #00C48C 直接鋪成小字白字按鈕背景。"
+        "name": "Line Geometry Discipline",
+        "section": "layout",
+        "body": "All transit segments in SVG network diagrams bend strictly at 45-degree and 90-degree angles with clear separation around the CENTRAL hub."
       },
       {
-        "name": "The OLED Containment Rule",
-        "section": "colors",
-        "body": "所有 Python 程式碼預覽、執行步驟堆疊、標準輸出與即時數值儀表皆收容於純黑 OLED 凹槽面（#0D1117）內，禁止將深色背景擴大成全站夜間模式而犧牲日間投影閱讀性。"
-      },
-      {
-        "name": "The Script Segregation Rule",
+        "name": "Minimal Copy Discipline",
         "section": "typography",
-        "body": "Chakra Petch 僅套用於英文與數字識別標記；所有繁體中文標題、按鈕標籤與內文必須使用 Noto Sans TC，防止混排時英文幾何字體替代造成筆畫粗細斷裂。"
-      },
-      {
-        "name": "The Direct Headline Rule",
-        "section": "typography",
-        "body": "各頁與區塊主標題上方不放置任何微型 Kicker 或眉標膠囊；標題以字重與級距自行建立視覺焦點，相關單元編號則以行內標籤緊鄰顯示或置於專屬規格欄中。"
-      },
-      {
-        "name": "The Soft-Bevel Shadow Rule",
-        "section": "elevation",
-        "body": "本系統採實體儀器加工感，所有表面與按鍵陰影必須保留適度擴散模糊（Soft Blur）與內縮底角陰影，嚴禁使用無模糊純平面位移色塊陰影，亦不為靜態容器添加彩色發光外暈。"
+        "body": "Headers and panels omit intro paragraphs and kickers above headings, prioritizing interactive controls, tabular figures, and concise code."
       }
     ],
     "dos": [
-      "Do keep Chakra Petch strictly for ASCII module codes (MOD-01..05), pad codes (PAD-A..F), and numeric counters, pairing with Noto Sans TC for all Traditional Chinese UI copy.",
-      "Do route every code visualization, stack view, and stdout output inside recessed #0D1117 OLED containers with clear contrast.",
-      "Do mark top module channels using full-width horizontal color strips (6px–8px) and inline status LEDs so students spot module identity and completion state at a glance.",
-      "Do make numeric telemetry (tabular-nums), sliders, and keyboard focus rings consistent across both desktop (1440px) and mobile (390px) layouts without clipping or wrapping inside segmented tab pills."
+      "Do keep every rail segment aligned at 45° or 90° angles with clear CENTRAL interchange spacing.",
+      "Do maintain 1px porcelain hairlines and dark #0B1230 foreground ink on Amber (#FFC20E), Cyan (#14B8C4), and Porcelain (#FFFFFF) pills."
     ],
     "donts": [
-      "Don't place small eyebrow labels, kickers, or badges above h1, h2, or h3 headings.",
-      "Don't use colored border-left or border-right stripes (>1px) on cards, alert boxes, tracklist rows, or callouts.",
-      "Don't reintroduce warm beige (#F7F6F2 / #E2E0D8) surfaces, muted slate-blue academic buttons (#1E4E8C), or text gradients anywhere in student or teacher pages.",
-      "Don't fake missing illustrations with decorative glassmorphism blurs, emoji icons instead of Lucide strokes, or zero-blur harsh block shadows."
+      "Don't place eyebrows above headings or multi-line prose paragraphs in header banners.",
+      "Don't use >1px colored border-left/right stripes or reintroduce light SaaS card grids."
     ]
   }
 }

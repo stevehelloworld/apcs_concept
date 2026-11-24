@@ -27,6 +27,7 @@ interface PracticeWorkbenchClientProps {
   initialType: string;
   initialDifficulty: string;
   initialStatus: string;
+  initialSource: string;
   initialAssignmentId: number | null;
   initialQuestionId: number | null;
   isLoggedIn: boolean;
@@ -39,6 +40,7 @@ export function PracticeWorkbenchClient({
   initialType,
   initialDifficulty,
   initialStatus,
+  initialSource,
   initialAssignmentId,
   initialQuestionId,
   isLoggedIn,
@@ -48,8 +50,9 @@ export function PracticeWorkbenchClient({
   const [typeFilter, setTypeFilter] = useState(initialType);
   const [diffFilter, setDiffFilter] = useState(initialDifficulty);
   const [statusFilter, setStatusFilter] = useState(initialStatus);
+  const [sourceFilter, setSourceFilter] = useState(initialSource);
   const [assignmentId, setAssignmentId] = useState<number | null>(initialAssignmentId);
-  const [mockMode, setMockMode] = useState(false);
+  const [mockMode, setMockMode] = useState<false | "all" | "mock">(false);
 
   const [selectedId, setSelectedId] = useState<number | null>(() => {
     if (initialQuestionId && initialQuestions.some((q) => q.id === initialQuestionId)) {
@@ -66,6 +69,7 @@ export function PracticeWorkbenchClient({
     nextType: string,
     nextDiff: string,
     nextStatus: string,
+    nextSource: string,
     nextAssign: number | null,
     limit?: number
   ) {
@@ -76,6 +80,7 @@ export function PracticeWorkbenchClient({
       if (nextType !== "all") qs.set("type", nextType);
       if (nextDiff !== "all") qs.set("difficulty", nextDiff);
       if (nextStatus !== "all") qs.set("status", nextStatus);
+      if (nextSource !== "all") qs.set("source", nextSource);
       if (nextAssign) qs.set("assignmentId", String(nextAssign));
       if (limit) qs.set("limit", String(limit));
 
@@ -95,17 +100,34 @@ export function PracticeWorkbenchClient({
     }
   }, [questions, selectedId]);
 
-  function handleStartMockExam() {
-    setMockMode(true);
+  async function handleStartMockExam(onlySim = false) {
+    setMockMode(onlySim ? "mock" : "all");
     setTopicFilter("all");
     setTypeFilter("all");
     setDiffFilter("all");
     setStatusFilter("all");
+    setSourceFilter(onlySim ? "mock" : "all");
     setAssignmentId(null);
     setSessionResults({});
-    const shuffled = [...initialQuestions].sort(() => 0.5 - Math.random()).slice(0, 10);
-    setQuestions(shuffled);
-    setSelectedId(shuffled[0]?.id ?? null);
+    setLoading(true);
+    try {
+      const url = onlySim ? "/api/questions?source=mock" : "/api/questions";
+      const res = await fetch(url);
+      const data = await res.json();
+      const pool = (data.questions ?? initialQuestions) as PublicQuestionRecord[];
+      const shuffled = [...pool].sort(() => 0.5 - Math.random()).slice(0, 10);
+      setQuestions(shuffled);
+      setSelectedId(shuffled[0]?.id ?? null);
+    } catch {
+      const fallbackPool = onlySim
+        ? initialQuestions.filter((q) => q.official_ref?.startsWith("SIM-"))
+        : initialQuestions;
+      const shuffled = [...fallbackPool].sort(() => 0.5 - Math.random()).slice(0, 10);
+      setQuestions(shuffled);
+      setSelectedId(shuffled[0]?.id ?? null);
+    } finally {
+      setLoading(false);
+    }
   }
 
   function handleAttempted(qId: number, res: AttemptSubmitResult) {
@@ -138,8 +160,10 @@ export function PracticeWorkbenchClient({
           <h1 className="font-display text-3xl font-extrabold tracking-wide text-white">
             {assignmentId
               ? `作業 #${assignmentId}`
-              : mockMode
-              ? "10 題模擬考"
+              : mockMode === "mock"
+              ? "10 題原創模擬考"
+              : mockMode === "all"
+              ? "10 題綜合模擬考"
               : "實戰刷題"}
           </h1>
           <span className="font-code text-xs text-[#7E91B8] tabular-nums">
@@ -147,22 +171,33 @@ export function PracticeWorkbenchClient({
           </span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           {!mockMode ? (
-            <button
-              type="button"
-              onClick={handleStartMockExam}
-              className="rail-btn-primary inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold"
-            >
-              <Sparkles className="h-3.5 w-3.5" strokeWidth={2.2} />
-              <span>10 題模擬</span>
-            </button>
+            <>
+              <button
+                type="button"
+                onClick={() => handleStartMockExam(true)}
+                className="rail-btn-cobalt inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold"
+              >
+                <Sparkles className="h-3.5 w-3.5" strokeWidth={2.2} />
+                <span>10 題原創模擬</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleStartMockExam(false)}
+                className="rail-btn-primary inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold"
+              >
+                <Sparkles className="h-3.5 w-3.5" strokeWidth={2.2} />
+                <span>10 題綜合模擬</span>
+              </button>
+            </>
           ) : (
             <button
               type="button"
               onClick={() => {
                 setMockMode(false);
-                applyFilters("all", "all", "all", "all", null);
+                setSourceFilter("all");
+                applyFilters("all", "all", "all", "all", "all", null);
               }}
               className="rail-btn inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold"
             >
@@ -175,7 +210,23 @@ export function PracticeWorkbenchClient({
 
       {/* Inline Filter Strip */}
       {!mockMode && (
-        <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="grid gap-2.5 sm:grid-cols-2 lg:grid-cols-6">
+          <select
+            aria-label="篩選題庫來源"
+            value={sourceFilter}
+            onChange={(e) => {
+              const v = e.target.value;
+              setSourceFilter(v);
+              setAssignmentId(null);
+              applyFilters(topicFilter, typeFilter, diffFilter, statusFilter, v, null);
+            }}
+            className="rail-input px-3 py-2 text-xs font-bold"
+          >
+            <option value="all">全部題庫</option>
+            <option value="official">官方 0915</option>
+            <option value="mock">原創模擬 SIM</option>
+          </select>
+
           <select
             aria-label="篩選路線"
             value={topicFilter}
@@ -183,7 +234,7 @@ export function PracticeWorkbenchClient({
               const v = e.target.value;
               setTopicFilter(v);
               setAssignmentId(null);
-              applyFilters(v, typeFilter, diffFilter, statusFilter, null);
+              applyFilters(v, typeFilter, diffFilter, statusFilter, sourceFilter, null);
             }}
             className="rail-input px-3 py-2 text-xs font-bold"
           >
@@ -202,7 +253,7 @@ export function PracticeWorkbenchClient({
               const v = e.target.value;
               setTypeFilter(v);
               setAssignmentId(null);
-              applyFilters(topicFilter, v, diffFilter, statusFilter, null);
+              applyFilters(topicFilter, v, diffFilter, statusFilter, sourceFilter, null);
             }}
             className="rail-input px-3 py-2 text-xs font-bold"
           >
@@ -221,7 +272,7 @@ export function PracticeWorkbenchClient({
               const v = e.target.value;
               setDiffFilter(v);
               setAssignmentId(null);
-              applyFilters(topicFilter, typeFilter, v, statusFilter, null);
+              applyFilters(topicFilter, typeFilter, v, statusFilter, sourceFilter, null);
             }}
             className="rail-input px-3 py-2 text-xs font-bold"
           >
@@ -241,7 +292,7 @@ export function PracticeWorkbenchClient({
               const v = e.target.value;
               setStatusFilter(v);
               setAssignmentId(null);
-              applyFilters(topicFilter, typeFilter, diffFilter, v, null);
+              applyFilters(topicFilter, typeFilter, diffFilter, v, sourceFilter, null);
             }}
             className="rail-input px-3 py-2 text-xs font-bold disabled:opacity-45"
           >
@@ -258,8 +309,9 @@ export function PracticeWorkbenchClient({
               setTypeFilter("all");
               setDiffFilter("all");
               setStatusFilter("all");
+              setSourceFilter("all");
               setAssignmentId(null);
-              applyFilters("all", "all", "all", "all", null);
+              applyFilters("all", "all", "all", "all", "all", null);
             }}
             className="rail-btn py-2 text-xs font-bold"
           >
@@ -331,7 +383,15 @@ export function PracticeWorkbenchClient({
                       <div className="flex items-center gap-1.5 font-code text-[11px] text-[#7E91B8] tabular-nums">
                         <span>{String(idx + 1).padStart(2, "0")}</span>
                         {q.official_ref && (
-                          <span className="font-bold text-white">{q.official_ref}</span>
+                          <span
+                            className={
+                              q.official_ref.startsWith("SIM-")
+                                ? "rounded border border-[#1E5BFF]/50 bg-[#1E5BFF]/22 px-1 font-bold text-[#7AA4FF]"
+                                : "font-bold text-white"
+                            }
+                          >
+                            {q.official_ref}
+                          </span>
                         )}
                         <span>· {QUESTION_TYPE_LABELS[q.question_type]}</span>
                       </div>

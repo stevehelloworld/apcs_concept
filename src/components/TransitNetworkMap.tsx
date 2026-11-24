@@ -181,6 +181,8 @@ function sampleStations(geom: LineGeometry, count: number) {
 
 function formatShortRef(ref: string | null, fallbackId: number): string {
   if (!ref) return `Q${fallbackId}`;
+  const sim = ref.match(/^SIM-(\d+)/i);
+  if (sim) return `S${sim[1].padStart(2, "0")}`;
   const m = ref.match(/Q\d+/i);
   return m ? m[0].toUpperCase() : ref.slice(0, 6);
 }
@@ -190,26 +192,55 @@ export function TransitNetworkMap({
   questions,
   isLoggedIn,
 }: TransitNetworkMapProps) {
+  const [sourceMode, setSourceMode] = useState<"official" | "mock">("official");
   const [focusedLine, setFocusedLine] = useState<string | null>(null);
   const [traceIdx, setTraceIdx] = useState(0);
 
+  const officialQuestions = useMemo(
+    () => questions.filter((q) => !q.official_ref?.startsWith("SIM-")),
+    [questions]
+  );
+  const mockQuestions = useMemo(
+    () => questions.filter((q) => q.official_ref?.startsWith("SIM-")),
+    [questions]
+  );
+  const visibleQuestions = useMemo(
+    () => (sourceMode === "mock" ? mockQuestions : officialQuestions),
+    [sourceMode, mockQuestions, officialQuestions]
+  );
+
   const defaultStation = useMemo(() => {
+    if (sourceMode === "mock") {
+      return visibleQuestions[0] ?? null;
+    }
     return (
-      questions.find((q) => q.official_ref?.includes("Q8")) ??
-      questions[0] ??
+      visibleQuestions.find((q) => q.official_ref?.includes("Q8")) ??
+      visibleQuestions[0] ??
       null
     );
-  }, [questions]);
+  }, [visibleQuestions, sourceMode]);
 
   const [selectedStationId, setSelectedStationId] = useState<number | null>(
     defaultStation?.id ?? null
   );
 
+  function handleSourceChange(mode: "official" | "mock") {
+    setSourceMode(mode);
+    const nextList = mode === "mock" ? mockQuestions : officialQuestions;
+    const nextDefault =
+      mode === "mock"
+        ? nextList[0] ?? null
+        : nextList.find((q) => q.official_ref?.includes("Q8")) ??
+          nextList[0] ??
+          null;
+    setSelectedStationId(nextDefault?.id ?? null);
+  }
+
   const topicLines = useMemo(() => {
     return topics.map((topic, idx) => {
       const theme = getTopicTheme(topic.slug, idx);
       const geom = LINE_GEOMETRIES[topic.slug] ?? LINE_GEOMETRIES["control-flow"];
-      const lineQuestions = questions.filter((q) => q.topic_slug === topic.slug);
+      const lineQuestions = visibleQuestions.filter((q) => q.topic_slug === topic.slug);
       const coords = sampleStations(geom, lineQuestions.length);
 
       const stations = lineQuestions.map((q, sIdx) => ({
@@ -230,10 +261,10 @@ export function TransitNetworkMap({
         solvedCount,
       };
     });
-  }, [topics, questions]);
+  }, [topics, visibleQuestions]);
 
   const selectedStation =
-    questions.find((q) => q.id === selectedStationId) ?? defaultStation;
+    visibleQuestions.find((q) => q.id === selectedStationId) ?? defaultStation;
 
   const selectedTheme = selectedStation
     ? getTopicTheme(selectedStation.topic_slug)
@@ -264,6 +295,10 @@ export function TransitNetworkMap({
                 {questions.length} 站互動路網
               </span>
             </h1>
+
+            <p className="font-code text-xs font-bold text-[#7E91B8] tabular-nums">
+              官方 {officialQuestions.length} · 原創模擬 {mockQuestions.length} 站
+            </p>
 
             <div className="flex flex-wrap items-center gap-2.5 pt-1">
               <Link
@@ -345,9 +380,39 @@ export function TransitNetworkMap({
           <div className="rail-frame p-3 sm:p-4 space-y-3">
             {/* Corridor Filter Pills */}
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2 font-code text-[11px] font-bold text-[#B8C5E0]">
-                <span className="h-2 w-2 rounded-full bg-[#E21D2D]" />
-                <span>APCS 0915</span>
+              <div
+                className="rail-well inline-flex p-0.5 gap-0.5"
+                role="tablist"
+                aria-label="路線題庫來源切換"
+              >
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={sourceMode === "official"}
+                  onClick={() => handleSourceChange("official")}
+                  className={`inline-flex items-center gap-1.5 rounded px-2.5 py-0.5 font-code text-[11px] font-bold ui-transition ${
+                    sourceMode === "official"
+                      ? "bg-white text-[#0B1230]"
+                      : "text-[#B8C5E0] hover:text-white"
+                  }`}
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#E21D2D]" />
+                  <span>官方 {officialQuestions.length} 站</span>
+                </button>
+                <button
+                  type="button"
+                  role="tab"
+                  aria-selected={sourceMode === "mock"}
+                  onClick={() => handleSourceChange("mock")}
+                  className={`inline-flex items-center gap-1.5 rounded px-2.5 py-0.5 font-code text-[11px] font-bold ui-transition ${
+                    sourceMode === "mock"
+                      ? "bg-[#1E5BFF] text-white"
+                      : "text-[#B8C5E0] hover:text-white"
+                  }`}
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-[#FFC20E]" />
+                  <span>原創模擬 {mockQuestions.length} 站</span>
+                </button>
               </div>
 
               <div className="flex flex-wrap items-center gap-1.5">
@@ -402,7 +467,7 @@ export function TransitNetworkMap({
                 viewBox="0 0 820 420"
                 className="w-full h-auto block select-none"
                 role="img"
-                aria-label="APCS Python 五大主題與 30 題互動路線圖"
+                aria-label={`APCS Python 五大主題與 ${questions.length} 題互動路線圖`}
               >
                 {/* Faint Enamel Underlay Grid & Blueprint Lines */}
                 <g stroke="#1E5BFF" strokeOpacity="0.11" strokeWidth="1" fill="none">
@@ -588,8 +653,16 @@ export function TransitNetworkMap({
                   >
                     {selectedTheme.code}
                   </span>
-                  <span className="font-code text-xs font-bold text-white shrink-0">
-                    {formatShortRef(selectedStation.official_ref, selectedStation.id)}
+                  <span
+                    className={`rounded px-1.5 py-0.5 font-code text-xs font-bold shrink-0 ${
+                      selectedStation.official_ref?.startsWith("SIM-")
+                        ? "border border-[#1E5BFF]/50 bg-[#1E5BFF]/22 text-[#7AA4FF]"
+                        : "text-white"
+                    }`}
+                  >
+                    {selectedStation.official_ref?.startsWith("SIM-")
+                      ? selectedStation.official_ref
+                      : formatShortRef(selectedStation.official_ref, selectedStation.id)}
                   </span>
                   <span className="truncate text-sm font-bold text-white max-w-[360px]">
                     {selectedStation.title}

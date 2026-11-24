@@ -50,7 +50,9 @@ export function TeacherQuestionsClient({
 }: TeacherQuestionsClientProps) {
   const [questions, setQuestions] = useState<QuestionRecord[]>(initialQuestions);
   const [topicFilter, setTopicFilter] = useState<string>("all");
-  const [scopeFilter, setScopeFilter] = useState<"all" | "global" | "custom">("all");
+  const [scopeFilter, setScopeFilter] = useState<
+    "all" | "official" | "mock" | "custom"
+  >("all");
   const [editing, setEditing] = useState<ReturnType<typeof makeEmptyQuestion> | null>(
     null
   );
@@ -60,7 +62,10 @@ export function TeacherQuestionsClient({
 
   const filtered = questions.filter((q) => {
     if (topicFilter !== "all" && String(q.topic_id) !== topicFilter) return false;
-    if (scopeFilter === "global" && q.created_by !== null) return false;
+    const isMock = q.created_by === null && Boolean(q.official_ref?.startsWith("SIM-"));
+    const isOfficial = q.created_by === null && !isMock;
+    if (scopeFilter === "official" && !isOfficial) return false;
+    if (scopeFilter === "mock" && !isMock) return false;
     if (scopeFilter === "custom" && q.created_by === null) return false;
     return true;
   });
@@ -469,19 +474,26 @@ export function TeacherQuestionsClient({
           ))}
         </select>
 
-        <div className="rail-well flex gap-1 p-0.5">
+        <div className="rail-well flex flex-wrap gap-1 p-0.5">
           {[
             { key: "all", label: "全部" },
-            { key: "global", label: "官方 30 題" },
+            { key: "official", label: "官方 0915" },
+            { key: "mock", label: "原創模擬" },
             { key: "custom", label: "自建題" },
           ].map((item) => (
             <button
               key={item.key}
               type="button"
-              onClick={() => setScopeFilter(item.key as "all" | "global" | "custom")}
+              onClick={() =>
+                setScopeFilter(
+                  item.key as "all" | "official" | "mock" | "custom"
+                )
+              }
               className={`rounded px-2.5 py-1 font-bold ui-transition ${
                 scopeFilter === item.key
-                  ? "bg-white text-[#0B1230]"
+                  ? item.key === "mock"
+                    ? "bg-[#1E5BFF] text-white"
+                    : "bg-white text-[#0B1230]"
                   : "text-[#B8C5E0] hover:text-white"
               }`}
             >
@@ -510,7 +522,13 @@ export function TeacherQuestionsClient({
               <tr key={q.id} className="hover:bg-white/[0.03]">
                 <td className="px-3.5 py-2.5">
                   <div className="flex items-center gap-2">
-                    <span className="rounded bg-white px-1.5 py-0.5 font-code text-[11px] font-bold text-[#0B1230]">
+                    <span
+                      className={`rounded px-1.5 py-0.5 font-code text-[11px] font-bold ${
+                        q.official_ref?.startsWith("SIM-")
+                          ? "border border-[#1E5BFF]/50 bg-[#1E5BFF]/22 text-[#7AA4FF]"
+                          : "bg-white text-[#0B1230]"
+                      }`}
+                    >
                       {q.official_ref ?? `#${q.id}`}
                     </span>
                     <span className="font-bold text-white">{q.title}</span>

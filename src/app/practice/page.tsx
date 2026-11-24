@@ -12,6 +12,7 @@ export default async function PracticePage({
     type?: string;
     difficulty?: string;
     status?: string;
+    source?: string;
     assignmentId?: string;
     qid?: string;
     q?: string;
@@ -25,6 +26,7 @@ export default async function PracticePage({
   const initialType = sp.type ?? "all";
   const initialDifficulty = sp.difficulty ?? "all";
   const initialStatus = sp.status ?? "all";
+  const initialSource = sp.source ?? "all";
   const initialAssignmentId = sp.assignmentId ? Number(sp.assignmentId) : null;
   const rawQid = sp.qid ?? sp.q;
   const initialQuestionId = rawQid ? Number(rawQid) : null;
@@ -34,6 +36,7 @@ export default async function PracticePage({
     questionType: initialType,
     difficulty: initialDifficulty,
     status: initialStatus,
+    source: initialSource,
     assignmentId: initialAssignmentId ?? undefined,
   });
 
@@ -46,6 +49,7 @@ export default async function PracticePage({
         initialType={initialType}
         initialDifficulty={initialDifficulty}
         initialStatus={initialStatus}
+        initialSource={initialSource}
         initialAssignmentId={initialAssignmentId}
         initialQuestionId={initialQuestionId}
         isLoggedIn={Boolean(user)}

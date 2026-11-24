@@ -1,8 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { ArrowRight, Cpu, Terminal } from "lucide-react";
+import { TOPIC_SYLLABUS_TAGS } from "@/lib/concept-lessons";
 import { getTopicTheme, QUESTION_TYPE_PAD_CODES } from "@/lib/topic-theme";
 import type { PublicQuestionRecord, QuestionType, TopicSummary } from "@/lib/types";
 import { DIFFICULTY_LABELS, QUESTION_TYPE_LABELS } from "@/lib/types";
@@ -19,8 +20,20 @@ export function TopicsDirectoryClient({
   isLoggedIn,
 }: TopicsDirectoryClientProps) {
   const [viewMode, setViewMode] = useState<"topic" | "type">("topic");
+  const [sourceFilter, setSourceFilter] = useState<"all" | "official" | "mock">("all");
   const allTypes = Object.keys(QUESTION_TYPE_LABELS) as QuestionType[];
-  const solvedTotal = allQuestions.filter((q) => q.user_last_attempt?.is_correct).length;
+
+  const filteredQuestions = useMemo(() => {
+    if (sourceFilter === "official") {
+      return allQuestions.filter((q) => !q.official_ref?.startsWith("SIM-"));
+    }
+    if (sourceFilter === "mock") {
+      return allQuestions.filter((q) => q.official_ref?.startsWith("SIM-"));
+    }
+    return allQuestions;
+  }, [allQuestions, sourceFilter]);
+
+  const solvedTotal = filteredQuestions.filter((q) => q.user_last_attempt?.is_correct).length;
 
   return (
     <div className="space-y-6">
@@ -30,15 +43,49 @@ export function TopicsDirectoryClient({
           <h1 className="font-display text-3xl font-extrabold tracking-wide text-white">
             路線總覽
           </h1>
+          <span className="font-code text-xs text-[#7E91B8] tabular-nums">
+            {filteredQuestions.length} 站
+          </span>
           {isLoggedIn && (
             <span className="inline-flex items-center gap-1.5 rounded border border-[#22B14C]/45 bg-[#22B14C]/15 px-2.5 py-0.5 font-code text-xs font-bold text-[#4ADE80] tabular-nums">
               <span className="h-2 w-2 rounded-full bg-[#22B14C]" />
-              {solvedTotal}/{allQuestions.length} 過關
+              {solvedTotal}/{filteredQuestions.length} 過關
             </span>
           )}
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
+          <div
+            className="rail-well inline-flex p-0.5 gap-0.5"
+            role="tablist"
+            aria-label="題庫來源篩選"
+          >
+            {[
+              { key: "all", label: "全部" },
+              { key: "official", label: "官方 0915" },
+              { key: "mock", label: "原創模擬" },
+            ].map((item) => (
+              <button
+                key={item.key}
+                type="button"
+                role="tab"
+                aria-selected={sourceFilter === item.key}
+                onClick={() =>
+                  setSourceFilter(item.key as "all" | "official" | "mock")
+                }
+                className={`whitespace-nowrap rounded px-2.5 py-1 font-code text-xs font-bold ui-transition ${
+                  sourceFilter === item.key
+                    ? item.key === "mock"
+                      ? "bg-[#1E5BFF] text-white"
+                      : "bg-white text-[#0B1230]"
+                    : "text-[#B8C5E0] hover:text-white"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+
           <div
             className="rail-well inline-flex p-0.5 gap-0.5"
             role="tablist"
@@ -73,7 +120,11 @@ export function TopicsDirectoryClient({
           </div>
 
           <Link
-            href="/practice"
+            href={
+              sourceFilter !== "all"
+                ? `/practice?source=${sourceFilter}`
+                : "/practice"
+            }
             className="rail-btn-primary inline-flex items-center gap-1.5 px-3.5 py-1.5 text-xs font-bold"
           >
             <Terminal className="h-3.5 w-3.5" strokeWidth={2.2} />
@@ -86,7 +137,8 @@ export function TopicsDirectoryClient({
         <div className="space-y-4">
           {topics.map((t, idx) => {
             const theme = getTopicTheme(t.slug, idx);
-            const topicQs = allQuestions.filter((q) => q.topic_id === t.id);
+            const topicQs = filteredQuestions.filter((q) => q.topic_id === t.id);
+            const syllabusTags = TOPIC_SYLLABUS_TAGS[t.slug] ?? [];
             const solvedCount = topicQs.filter(
               (q) => q.user_last_attempt?.is_correct
             ).length;
@@ -99,24 +151,38 @@ export function TopicsDirectoryClient({
               >
                 {/* Line Header Bar */}
                 <div className="flex flex-wrap items-center justify-between gap-3">
-                  <div className="flex flex-wrap items-center gap-2.5 min-w-0">
-                    <span
-                      className="rounded px-2 py-0.5 font-display text-xs font-extrabold shrink-0"
-                      style={{
-                        backgroundColor: theme.hex,
-                        color: theme.buttonText,
-                      }}
-                    >
-                      {theme.code}
-                    </span>
-                    <h2 className="text-lg font-black text-white truncate">
-                      {t.title}
-                    </h2>
-                    <span className="font-code text-xs text-[#7E91B8] tabular-nums shrink-0">
-                      {isLoggedIn
-                        ? `${solvedCount}/${topicQs.length} 過關`
-                        : `${topicQs.length} 站`}
-                    </span>
+                  <div className="space-y-1.5 min-w-0">
+                    <div className="flex flex-wrap items-center gap-2.5 min-w-0">
+                      <span
+                        className="rounded px-2 py-0.5 font-display text-xs font-extrabold shrink-0"
+                        style={{
+                          backgroundColor: theme.hex,
+                          color: theme.buttonText,
+                        }}
+                      >
+                        {theme.code}
+                      </span>
+                      <h2 className="text-lg font-black text-white truncate">
+                        {t.title}
+                      </h2>
+                      <span className="font-code text-xs text-[#7E91B8] tabular-nums shrink-0">
+                        {isLoggedIn
+                          ? `${solvedCount}/${topicQs.length} 過關`
+                          : `${topicQs.length} 站`}
+                      </span>
+                    </div>
+                    {syllabusTags.length > 0 && (
+                      <div className="flex flex-wrap items-center gap-1.5">
+                        {syllabusTags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="rounded border border-white/15 bg-[#070C22]/70 px-1.5 py-0.5 font-code text-[10px] font-semibold text-[#B8C5E0]"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
                   </div>
 
                   <div className="flex items-center gap-2 shrink-0">
@@ -132,7 +198,9 @@ export function TopicsDirectoryClient({
                       <span>互動實驗室</span>
                     </Link>
                     <Link
-                      href={`/practice?topic=${t.slug}`}
+                      href={`/practice?topic=${t.slug}${
+                        sourceFilter !== "all" ? `&source=${sourceFilter}` : ""
+                      }`}
                       className="rail-btn inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold"
                     >
                       <span>刷題</span>
@@ -151,6 +219,7 @@ export function TopicsDirectoryClient({
                   <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
                     {topicQs.map((q) => {
                       const att = q.user_last_attempt;
+                      const isSim = q.official_ref?.startsWith("SIM-");
                       const dotColor = att
                         ? att.is_correct
                           ? "#22B14C"
@@ -173,7 +242,13 @@ export function TopicsDirectoryClient({
                             />
                             <div className="min-w-0">
                               <div className="flex items-center gap-1.5 font-code text-[11px] text-[#7E91B8]">
-                                <span className="font-bold text-white">
+                                <span
+                                  className={
+                                    isSim
+                                      ? "rounded border border-[#1E5BFF]/50 bg-[#1E5BFF]/22 px-1 font-bold text-[#7AA4FF]"
+                                      : "font-bold text-white"
+                                  }
+                                >
                                   {q.official_ref ?? `Q${q.id}`}
                                 </span>
                                 <span>·</span>
@@ -202,7 +277,7 @@ export function TopicsDirectoryClient({
       ) : (
         <div className="space-y-4">
           {allTypes.map((qt) => {
-            const typeQs = allQuestions.filter((q) => q.question_type === qt);
+            const typeQs = filteredQuestions.filter((q) => q.question_type === qt);
             return (
               <section key={qt} className="rail-frame p-4 sm:p-5 space-y-3">
                 <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/15 pb-3">
@@ -219,7 +294,9 @@ export function TopicsDirectoryClient({
                   </div>
 
                   <Link
-                    href={`/practice?type=${qt}`}
+                    href={`/practice?type=${qt}${
+                      sourceFilter !== "all" ? `&source=${sourceFilter}` : ""
+                    }`}
                     className="rail-btn-primary inline-flex items-center gap-1 px-3 py-1.5 text-xs font-bold"
                   >
                     <span>特訓</span>
@@ -227,55 +304,68 @@ export function TopicsDirectoryClient({
                   </Link>
                 </div>
 
-                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
-                  {typeQs.map((q) => {
-                    const topicTheme = getTopicTheme(q.topic_slug);
-                    const att = q.user_last_attempt;
-                    const dotColor = att
-                      ? att.is_correct
-                        ? "#22B14C"
-                        : "#E21D2D"
-                      : "#FFFFFF";
+                {typeQs.length === 0 ? (
+                  <p className="font-code text-xs text-[#7E91B8] py-2">
+                    此來源分類目前無對應題目。
+                  </p>
+                ) : (
+                  <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                    {typeQs.map((q) => {
+                      const topicTheme = getTopicTheme(q.topic_slug);
+                      const att = q.user_last_attempt;
+                      const isSim = q.official_ref?.startsWith("SIM-");
+                      const dotColor = att
+                        ? att.is_correct
+                          ? "#22B14C"
+                          : "#E21D2D"
+                        : "#FFFFFF";
 
-                    return (
-                      <Link
-                        key={q.id}
-                        href={`/practice?type=${qt}&qid=${q.id}`}
-                        className="rail-well group flex items-center justify-between gap-2.5 px-3 py-2.5 hover:border-white/50 ui-transition"
-                      >
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <span
-                            className="h-3 w-3 rounded-full shrink-0 border-2"
-                            style={{
-                              backgroundColor: dotColor,
-                              borderColor: att ? "#FFFFFF" : topicTheme.hex,
-                            }}
-                          />
-                          <div className="min-w-0">
-                            <div className="flex items-center gap-1.5 font-code text-[11px] text-[#7E91B8]">
-                              <span className="font-bold text-white">
-                                {q.official_ref ?? `Q${q.id}`}
-                              </span>
-                              <span>·</span>
-                              <span style={{ color: topicTheme.text }}>
-                                {topicTheme.code}
-                              </span>
-                              <span>·</span>
-                              <span>{DIFFICULTY_LABELS[q.difficulty]}</span>
-                            </div>
-                            <div className="truncate text-xs font-bold text-[#B8C5E0] group-hover:text-white">
-                              {q.title}
+                      return (
+                        <Link
+                          key={q.id}
+                          href={`/practice?type=${qt}&qid=${q.id}`}
+                          className="rail-well group flex items-center justify-between gap-2.5 px-3 py-2.5 hover:border-white/50 ui-transition"
+                        >
+                          <div className="flex items-center gap-2.5 min-w-0">
+                            <span
+                              className="h-3 w-3 rounded-full shrink-0 border-2"
+                              style={{
+                                backgroundColor: dotColor,
+                                borderColor: att ? "#FFFFFF" : topicTheme.hex,
+                              }}
+                            />
+                            <div className="min-w-0">
+                              <div className="flex items-center gap-1.5 font-code text-[11px] text-[#7E91B8]">
+                                <span
+                                  className={
+                                    isSim
+                                      ? "rounded border border-[#1E5BFF]/50 bg-[#1E5BFF]/22 px-1 font-bold text-[#7AA4FF]"
+                                      : "font-bold text-white"
+                                  }
+                                >
+                                  {q.official_ref ?? `Q${q.id}`}
+                                </span>
+                                <span>·</span>
+                                <span style={{ color: topicTheme.text }}>
+                                  {topicTheme.code}
+                                </span>
+                                <span>·</span>
+                                <span>{DIFFICULTY_LABELS[q.difficulty]}</span>
+                              </div>
+                              <div className="truncate text-xs font-bold text-[#B8C5E0] group-hover:text-white">
+                                {q.title}
+                              </div>
                             </div>
                           </div>
-                        </div>
-                        <ArrowRight
-                          className="h-3.5 w-3.5 shrink-0 text-[#7E91B8] group-hover:text-white"
-                          strokeWidth={2}
-                        />
-                      </Link>
-                    );
-                  })}
-                </div>
+                          <ArrowRight
+                            className="h-3.5 w-3.5 shrink-0 text-[#7E91B8] group-hover:text-white"
+                            strokeWidth={2}
+                          />
+                        </Link>
+                      );
+                    })}
+                  </div>
+                )}
               </section>
             );
           })}

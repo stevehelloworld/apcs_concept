@@ -88,7 +88,13 @@ export function PracticeQuestionCard({
       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-white/15 pb-3">
         <div className="flex flex-wrap items-center gap-2 text-xs">
           {question.official_ref && (
-            <span className="rounded bg-white px-2 py-0.5 font-code font-bold text-[#0B1230]">
+            <span
+              className={`rounded px-2 py-0.5 font-code font-bold ${
+                question.official_ref.startsWith("SIM-")
+                  ? "border border-[#1E5BFF]/50 bg-[#1E5BFF]/22 text-[#7AA4FF]"
+                  : "bg-white text-[#0B1230]"
+              }`}
+            >
               {question.official_ref}
             </span>
           )}

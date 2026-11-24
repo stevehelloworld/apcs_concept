@@ -6,6 +6,8 @@ import { SEED_QUESTIONS_LOOPS_RANGE } from "./q-loops-range";
 import { SEED_QUESTIONS_LISTS_GRID } from "./q-lists-grid";
 import { SEED_QUESTIONS_FUNCTIONS_RECURSION } from "./q-functions-recursion";
 import { SEED_QUESTIONS_ALGORITHMS_COMPLEXITY } from "./q-algorithms-complexity";
+import { SEED_MOCK_QUESTIONS_PART1 } from "./q-mock-part1";
+import { SEED_MOCK_QUESTIONS_PART2 } from "./q-mock-part2";
 
 function createPasswordHash(password: string): string {
   const salt = randomBytes(16).toString("hex");
@@ -13,11 +15,63 @@ function createPasswordHash(password: string): string {
   return `${salt}:${derived}`;
 }
 
+export async function syncSupplementalSeedQuestions(db: DbClient): Promise<void> {
+  const supplemental = [
+    ...SEED_MOCK_QUESTIONS_PART1,
+    ...SEED_MOCK_QUESTIONS_PART2,
+  ];
+  const existingRows = await db.queryAll<{ official_ref: string | null }>(
+    "SELECT official_ref FROM questions WHERE official_ref LIKE 'SIM-%'"
+  );
+  const existingSet = new Set(
+    existingRows.map((r) => r.official_ref).filter((x): x is string => Boolean(x))
+  );
+  const missing = supplemental.filter((q) => !existingSet.has(q.official_ref));
+  if (missing.length === 0) return;
+
+  const topicRows = await db.queryAll<{ id: number; slug: string }>(
+    "SELECT id, slug FROM topics"
+  );
+  const topicSlugToId = new Map(topicRows.map((t) => [t.slug, Number(t.id)]));
+
+  const stmts = missing
+    .map((q) => {
+      const topicId = topicSlugToId.get(q.topic_slug);
+      if (!topicId) return null;
+      return {
+        sql: `INSERT INTO questions (
+          topic_id, official_ref, title, prompt, code, question_type,
+          difficulty, options_json, correct_option, explanation, trace_steps_json,
+          created_by, class_id, is_published
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NULL, NULL, 1)`,
+        args: [
+          topicId,
+          q.official_ref,
+          q.title,
+          q.prompt,
+          q.code,
+          q.question_type,
+          q.difficulty,
+          JSON.stringify(q.options),
+          q.correct_option,
+          q.explanation,
+          JSON.stringify(q.trace_steps),
+        ],
+      };
+    })
+    .filter((s): s is NonNullable<typeof s> => s !== null);
+
+  if (stmts.length > 0) {
+    await db.execBatch(stmts);
+  }
+}
+
 export async function seedDatabaseIfEmpty(db: DbClient): Promise<void> {
   const topicCount = await db.queryOne<{ cnt: number }>(
     "SELECT COUNT(*) AS cnt FROM topics"
   );
   if (topicCount && Number(topicCount.cnt) > 0) {
+    await syncSupplementalSeedQuestions(db);
     return;
   }
 
@@ -91,6 +145,8 @@ export async function seedDatabaseIfEmpty(db: DbClient): Promise<void> {
       })
     );
   }
+
+  await syncSupplementalSeedQuestions(db);
 
   const questionRows = await db.queryAll<{ id: number; official_ref: string | null }>(
     "SELECT id, official_ref FROM questions WHERE official_ref IS NOT NULL"

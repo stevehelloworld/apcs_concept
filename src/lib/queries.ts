@@ -105,6 +105,7 @@ export async function queryVisibleQuestions(
     topicSlug?: string;
     questionType?: string;
     difficulty?: string;
+    source?: string; // "all" | "official" | "mock"
     assignmentId?: number;
     status?: string; // "all" | "unsolved" | "wrong" | "solved"
     limit?: number;
@@ -163,6 +164,11 @@ export async function queryVisibleQuestions(
   if (filters.difficulty && filters.difficulty !== "all") {
     clauses.push("q.difficulty = ?");
     params.push(filters.difficulty);
+  }
+  if (filters.source === "official") {
+    clauses.push("q.official_ref LIKE '0915-%'");
+  } else if (filters.source === "mock") {
+    clauses.push("q.official_ref LIKE 'SIM-%'");
   }
   if (assignmentQuestionOrder) {
     clauses.push(`q.id IN (${assignmentQuestionOrder.map(() => "?").join(",")})`);

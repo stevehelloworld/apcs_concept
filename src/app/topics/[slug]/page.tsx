@@ -2,10 +2,15 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, Clock, Terminal } from "lucide-react";
 import { getCurrentUser } from "@/lib/auth";
+import {
+  CONCEPT_LESSONS_BY_TOPIC,
+  TOPIC_SYLLABUS_TAGS,
+} from "@/lib/concept-lessons";
 import { getTopicBySlugForUser, listPublishedTopics } from "@/lib/queries";
 import { getTopicTheme } from "@/lib/topic-theme";
 import { DIFFICULTY_LABELS, QUESTION_TYPE_LABELS } from "@/lib/types";
-import { PythonCodeView } from "@/components/PythonCodeView";
+import { ConceptDeckClient } from "@/components/ConceptDeckClient";
+import { PitfallCompareClient } from "@/components/PitfallCompareClient";
 import { TopicVisualizerHost } from "@/components/visualizers/TopicVisualizerHost";
 import { PracticeQuestionCard } from "@/components/PracticeQuestionCard";
 
@@ -31,6 +36,17 @@ export default async function TopicDetailPage({
 
   const { topic, questions } = data;
   const theme = getTopicTheme(topic.slug, currentIdx);
+  const conceptLessons =
+    CONCEPT_LESSONS_BY_TOPIC[topic.slug] ??
+    CONCEPT_LESSONS_BY_TOPIC["control-flow"];
+  const syllabusTags = TOPIC_SYLLABUS_TAGS[topic.slug] ?? [];
+
+  const officialCount = questions.filter((q) =>
+    q.official_ref?.startsWith("0915-")
+  ).length;
+  const mockCount = questions.filter((q) =>
+    q.official_ref?.startsWith("SIM-")
+  ).length;
   const checkInQuestions = questions.slice(0, 3);
 
   return (
@@ -64,7 +80,7 @@ export default async function TopicDetailPage({
 
         <nav className="flex flex-wrap items-center gap-3 font-code text-xs text-[#B8C5E0]">
           <a href="#core-concepts" className="hover:text-white">
-            觀念
+            互動觀念
           </a>
           <a href="#interactive-lab" className="hover:text-white">
             實驗室
@@ -85,7 +101,7 @@ export default async function TopicDetailPage({
       <section className="rail-frame overflow-hidden">
         <div className="h-1 w-full" style={{ backgroundColor: theme.hex }} />
         <div className="p-4 sm:p-5 flex flex-wrap items-center justify-between gap-4">
-          <div className="space-y-1.5 min-w-0">
+          <div className="space-y-2 min-w-0">
             <div className="flex flex-wrap items-center gap-2">
               <span
                 className="rounded px-2 py-0.5 font-display text-xs font-extrabold"
@@ -97,15 +113,28 @@ export default async function TopicDetailPage({
                 {topic.title}
               </h1>
             </div>
-            <div className="flex flex-wrap items-center gap-3 font-code text-xs text-[#B8C5E0] tabular-nums">
+
+            <div className="flex flex-wrap items-center gap-2 font-code text-xs text-[#B8C5E0] tabular-nums">
               <span className="inline-flex items-center gap-1">
                 <Clock className="h-3.5 w-3.5" strokeWidth={2} />
                 {topic.study_minutes}m
               </span>
               <span>·</span>
-              <span>{questions.length} 站</span>
-              <span>·</span>
-              <span>{topic.exam_weight}</span>
+              <span>官方 {officialCount}</span>
+              {mockCount > 0 && (
+                <>
+                  <span>·</span>
+                  <span className="text-[#7AA4FF]">原創模擬 {mockCount}</span>
+                </>
+              )}
+              {syllabusTags.map((tag) => (
+                <span
+                  key={tag}
+                  className="rounded border border-white/15 bg-[#070C22] px-2 py-0.5 text-[11px] text-[#B8C5E0]"
+                >
+                  {tag}
+                </span>
+              ))}
             </div>
           </div>
 
@@ -128,34 +157,16 @@ export default async function TopicDetailPage({
         </div>
       </section>
 
-      {/* Core Concepts (Code-first, concise notes) */}
+      {/* Interactive Concept Deck */}
       <section id="core-concepts" className="space-y-3">
         <h2 className="font-display text-xl font-extrabold tracking-wide text-white">
-          核心語法要點
+          互動觀念實驗卡
         </h2>
-        <div className="grid gap-4 lg:grid-cols-2">
-          {topic.core_concepts.map((concept, idx) => (
-            <div key={idx} className="rail-frame p-4 space-y-3">
-              <div className="flex items-center gap-2">
-                <span
-                  className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded font-code text-[11px] font-bold"
-                  style={{
-                    backgroundColor: theme.hex,
-                    color: theme.buttonText,
-                  }}
-                >
-                  {idx + 1}
-                </span>
-                <h3 className="text-sm font-black text-white">{concept.title}</h3>
-              </div>
-              <PythonCodeView code={concept.code} compact />
-              <div className="text-xs leading-relaxed text-[#B8C5E0]">
-                <strong style={{ color: theme.text }}>重點：</strong>
-                {concept.note}
-              </div>
-            </div>
-          ))}
-        </div>
+        <ConceptDeckClient
+          theme={theme}
+          lessons={conceptLessons}
+          cmsConcepts={topic.core_concepts}
+        />
       </section>
 
       {/* Topic-Specific Interactive Visualizer */}
@@ -166,7 +177,7 @@ export default async function TopicDetailPage({
         <TopicVisualizerHost type={topic.visualizer_type} />
       </section>
 
-      {/* Station Matrix */}
+      {/* Station Matrix (Official + Mock SIM) */}
       <section id="official-walkthrough" className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
           <h2 className="font-display text-xl font-extrabold tracking-wide text-white">
@@ -183,6 +194,7 @@ export default async function TopicDetailPage({
         <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {questions.map((q) => {
             const att = q.user_last_attempt;
+            const isSim = q.official_ref?.startsWith("SIM-");
             const dotColor = att
               ? att.is_correct
                 ? "#22B14C"
@@ -205,15 +217,20 @@ export default async function TopicDetailPage({
                   />
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5 font-code text-[11px] text-[#7E91B8]">
-                      <span className="font-bold text-white">
+                      <span
+                        className={`rounded px-1.5 py-0.2 font-bold ${
+                          isSim
+                            ? "bg-[#1E5BFF]/25 text-[#7AA4FF] border border-[#1E5BFF]/45"
+                            : "bg-white text-[#0B1230]"
+                        }`}
+                      >
                         {q.official_ref ?? `Q${q.id}`}
                       </span>
-                      <span>·</span>
                       <span>{QUESTION_TYPE_LABELS[q.question_type]}</span>
                       <span>·</span>
                       <span>{DIFFICULTY_LABELS[q.difficulty]}</span>
                     </div>
-                    <div className="truncate text-xs font-bold text-[#B8C5E0] group-hover:text-white">
+                    <div className="mt-0.5 truncate text-xs font-bold text-[#B8C5E0] group-hover:text-white">
                       {q.title}
                     </div>
                   </div>
@@ -228,42 +245,12 @@ export default async function TopicDetailPage({
         </div>
       </section>
 
-      {/* A/B Pitfalls */}
+      {/* Interactive Tabbed A/B Pitfalls */}
       <section id="pitfalls" className="space-y-3">
         <h2 className="font-display text-xl font-extrabold tracking-wide text-white">
           A/B 地雷對照
         </h2>
-        <div className="space-y-4">
-          {topic.pitfalls.map((p, idx) => (
-            <div key={idx} className="rail-frame p-4 space-y-3">
-              <div className="flex flex-wrap items-center justify-between gap-2">
-                <h3 className="text-sm font-black text-[#FF7A85]">{p.title}</h3>
-                <span className="rounded border border-[#FFC20E]/45 bg-[#FFC20E]/12 px-2.5 py-0.5 font-code text-[11px] font-bold text-[#FFD452]">
-                  測資：{p.triggerInput}
-                </span>
-              </div>
-
-              <div className="grid gap-3 lg:grid-cols-2">
-                <div className="space-y-1">
-                  <div className="font-code text-[11px] font-bold text-[#FF7A85]">
-                    WRONG
-                  </div>
-                  <PythonCodeView code={p.wrongCode} compact />
-                </div>
-                <div className="space-y-1">
-                  <div className="font-code text-[11px] font-bold text-[#4ADE80]">
-                    FIXED
-                  </div>
-                  <PythonCodeView code={p.fixedCode} compact />
-                </div>
-              </div>
-
-              <p className="text-xs leading-relaxed text-[#B8C5E0]">
-                {p.explanation}
-              </p>
-            </div>
-          ))}
-        </div>
+        <PitfallCompareClient pitfalls={topic.pitfalls} />
       </section>
 
       {/* Check-in Micro Quiz */}
