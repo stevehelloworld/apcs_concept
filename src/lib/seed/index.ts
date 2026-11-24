@@ -15,13 +15,60 @@ function createPasswordHash(password: string): string {
   return `${salt}:${derived}`;
 }
 
+async function ensureUniqueBuiltinOfficialRefIndex(db: DbClient): Promise<void> {
+  const duplicates = await db.queryAll<{
+    official_ref: string;
+    keep_id: number;
+  }>(
+    `SELECT official_ref, MIN(id) AS keep_id
+     FROM questions
+     WHERE created_by IS NULL AND official_ref IS NOT NULL
+     GROUP BY official_ref
+     HAVING COUNT(*) > 1`
+  );
+
+  if (duplicates.length > 0) {
+    const repairStmts: Array<{ sql: string; args: Array<string | number | null> }> = [];
+    for (const dup of duplicates) {
+      const keepId = Number(dup.keep_id);
+      repairStmts.push({
+        sql: `UPDATE attempts
+              SET question_id = ?
+              WHERE question_id IN (
+                SELECT id FROM questions
+                WHERE created_by IS NULL AND official_ref = ? AND id <> ?
+              )`,
+        args: [keepId, dup.official_ref, keepId],
+      });
+      repairStmts.push({
+        sql: `DELETE FROM questions
+              WHERE created_by IS NULL AND official_ref = ? AND id <> ?`,
+        args: [dup.official_ref, keepId],
+      });
+    }
+    await db.execBatch(repairStmts);
+  }
+
+  try {
+    await db.run(
+      `CREATE UNIQUE INDEX IF NOT EXISTS idx_questions_builtin_official_ref
+       ON questions(official_ref)
+       WHERE created_by IS NULL AND official_ref IS NOT NULL`
+    );
+  } catch {
+    // Ignore benign concurrent DDL race when two cold serverless workers create the index simultaneously.
+  }
+}
+
 export async function syncSupplementalSeedQuestions(db: DbClient): Promise<void> {
+  await ensureUniqueBuiltinOfficialRefIndex(db);
+
   const supplemental = [
     ...SEED_MOCK_QUESTIONS_PART1,
     ...SEED_MOCK_QUESTIONS_PART2,
   ];
   const existingRows = await db.queryAll<{ official_ref: string | null }>(
-    "SELECT official_ref FROM questions WHERE official_ref LIKE 'SIM-%'"
+    "SELECT official_ref FROM questions WHERE created_by IS NULL AND official_ref LIKE 'SIM-%'"
   );
   const existingSet = new Set(
     existingRows.map((r) => r.official_ref).filter((x): x is string => Boolean(x))
@@ -39,7 +86,7 @@ export async function syncSupplementalSeedQuestions(db: DbClient): Promise<void>
       const topicId = topicSlugToId.get(q.topic_slug);
       if (!topicId) return null;
       return {
-        sql: `INSERT INTO questions (
+        sql: `INSERT OR IGNORE INTO questions (
           topic_id, official_ref, title, prompt, code, question_type,
           difficulty, options_json, correct_option, explanation, trace_steps_json,
           created_by, class_id, is_published
@@ -104,6 +151,7 @@ export async function seedDatabaseIfEmpty(db: DbClient): Promise<void> {
   const topicSlugToId = new Map(topicRows.map((t) => [t.slug, Number(t.id)]));
 
   // 2. Insert 30 Official APCS 0915 Python Questions (if table empty)
+  await ensureUniqueBuiltinOfficialRefIndex(db);
   const qCount = await db.queryOne<{ cnt: number }>(
     "SELECT COUNT(*) AS cnt FROM questions"
   );
@@ -123,7 +171,7 @@ export async function seedDatabaseIfEmpty(db: DbClient): Promise<void> {
           throw new Error(`Missing topic_id for slug ${q.topic_slug}`);
         }
         return {
-          sql: `INSERT INTO questions (
+          sql: `INSERT OR IGNORE INTO questions (
             topic_id, official_ref, title, prompt, code, question_type,
             difficulty, options_json, correct_option, explanation, trace_steps_json,
             created_by, class_id, is_published
